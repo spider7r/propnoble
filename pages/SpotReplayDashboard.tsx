@@ -103,7 +103,7 @@ export default function SpotReplayDashboard() {
 
                             <div className="flex flex-col sm:flex-row items-center gap-5 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
                                 <a
-                                    href="https://replay.propmatchspot.com/signup"
+                                    href="https://replay.PropNoble.com/signup"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="group relative w-full sm:w-auto min-w-[240px] px-8 py-4 bg-brand-gold text-black font-bold text-lg tracking-wide rounded-xl overflow-hidden shadow-[0_0_40px_-10px_rgba(246,174,19,0.6)] hover:shadow-[0_0_60px_-5px_rgba(247,174,17,0.7)] hover:scale-105 transition-all duration-300 text-center"
@@ -114,7 +114,7 @@ export default function SpotReplayDashboard() {
                                     </span>
                                 </a>
                                 <a
-                                    href="https://replay.propmatchspot.com/login"
+                                    href="https://replay.PropNoble.com/login"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="group relative w-full sm:w-auto min-w-[240px] px-8 py-4 bg-white/5 backdrop-blur-xl border border-white/10 text-white font-medium text-lg tracking-wide rounded-xl overflow-hidden hover:bg-white/10 hover:border-brand-gold/50 transition-all duration-300 text-center"
@@ -525,7 +525,7 @@ export default function SpotReplayDashboard() {
 
                                 {/* CTA */}
                                 <a
-                                    href="https://replay.propmatchspot.com/signup"
+                                    href="https://replay.PropNoble.com/signup"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="w-full flex justify-center py-3.5 px-6 rounded-xl text-sm font-bold text-white bg-white/5 border border-white/10 hover:bg-white/10 hover:border-brand-gold/30 transition-all duration-300 text-center"
@@ -579,7 +579,7 @@ export default function SpotReplayDashboard() {
 
                                 {/* CTA */}
                                 <a
-                                    href="https://replay.propmatchspot.com/signup"
+                                    href="https://replay.PropNoble.com/signup"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="group/btn relative w-full flex justify-center py-3.5 px-6 rounded-xl text-sm font-bold text-black bg-brand-gold hover:bg-white transition-all duration-300 text-center overflow-hidden shadow-[0_0_30px_-5px_rgba(246,174,19,0.5)]"
@@ -657,7 +657,7 @@ export default function SpotReplayDashboard() {
                             </p>
                             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                                 <a
-                                    href="https://replay.propmatchspot.com/signup"
+                                    href="https://replay.PropNoble.com/signup"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="group relative w-full sm:w-auto min-w-[260px] px-8 py-4 bg-brand-gold text-black font-bold text-lg tracking-wide rounded-xl overflow-hidden shadow-[0_0_40px_-10px_rgba(246,174,19,0.6)] hover:shadow-[0_0_60px_-5px_rgba(247,174,17,0.7)] hover:scale-105 transition-all duration-300 text-center"
@@ -668,7 +668,7 @@ export default function SpotReplayDashboard() {
                                     </span>
                                 </a>
                                 <a
-                                    href="https://replay.propmatchspot.com/login"
+                                    href="https://replay.PropNoble.com/login"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="w-full sm:w-auto min-w-[200px] px-8 py-4 bg-white/5 border border-white/10 text-white font-medium text-lg rounded-xl hover:bg-white/10 hover:border-brand-gold/50 transition-all text-center"

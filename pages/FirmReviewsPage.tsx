@@ -332,7 +332,7 @@ const FirmReviewsPage: React.FC = () => {
                             <div className="text-brand-muted/70 text-xs flex items-center gap-2 mt-1.5 font-medium">
                               <span>{new Date(review.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                               <span className="w-1 h-1 rounded-full bg-brand-border/50"></span>
-                              <span className="flex items-center gap-1 text-green-500/80"><Shield size={10} className="text-green-500" /> Verified By Spot Sheriff</span>
+                              <span className="flex items-center gap-1 text-green-500/80"><Shield size={10} className="text-green-500" /> Verified By Noble Sheriff</span>
                             </div>
                           </div>
                         </div>

@@ -15,7 +15,7 @@ const AboutUsPage: React.FC = () => {
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
                     <div className="inline-flex items-center gap-2 bg-brand-gold/[0.08] border border-brand-gold/20 rounded-full px-5 py-2 mb-8">
                         <Shield className="w-4 h-4 text-brand-gold" />
-                        <span className="text-xs font-bold text-brand-gold uppercase tracking-widest">About PropMatchSpot</span>
+                        <span className="text-xs font-bold text-brand-gold uppercase tracking-widest">About PropNoble</span>
                     </div>
                     <h1 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tight leading-[1.1]">
                         Built by Traders.<br /><span className="text-gradient-gold">For Traders.</span>
@@ -59,7 +59,7 @@ const AboutUsPage: React.FC = () => {
                                     After losing <strong className="text-white">$800+</strong> to a prop firm with fake reviews and delayed payouts, we decided enough was enough. There had to be a better way.
                                 </p>
                                 <p>
-                                    That's when <strong className="text-brand-gold">PropMatchSpot</strong> was born — a single platform where traders can compare every major firm side-by-side, access verified payout data, read real community reviews, and save money with exclusive deals. All for free.
+                                    That's when <strong className="text-brand-gold">PropNoble</strong> was born — a single platform where traders can compare every major firm side-by-side, access verified payout data, read real community reviews, and save money with exclusive deals. All for free.
                                 </p>
                             </div>
                         </div>
@@ -68,7 +68,7 @@ const AboutUsPage: React.FC = () => {
                         <div className="space-y-4">
                             {[
                                 { year: '2023', title: 'The Problem', desc: 'Lost $800+ to a poorly-rated prop firm. Realized there was no reliable way to compare firms.', icon: <Target size={18} /> },
-                                { year: '2024', title: 'The Build', desc: 'Built PropMatchSpot from scratch — aggregating data from 50+ firms, creating TrustGuard™ algorithm.', icon: <Zap size={18} /> },
+                                { year: '2024', title: 'The Build', desc: 'Built PropNoble from scratch — aggregating data from 50+ firms, creating TrustGuard™ algorithm.', icon: <Zap size={18} /> },
                                 { year: '2025', title: 'The Growth', desc: '50,000+ traders, 85+ firms listed, $42M+ in verified payouts tracked, and growing every day.', icon: <TrendingUp size={18} /> },
                             ].map((item, i) => (
                                 <div key={i} className="group relative rounded-2xl overflow-hidden">
@@ -149,7 +149,7 @@ const AboutUsPage: React.FC = () => {
                             {
                                 icon: <Globe size={24} />,
                                 title: 'Accessible to All',
-                                desc: "PropMatchSpot is 100% free and always will be. Every trader deserves access to quality data, regardless of account size or experience level.",
+                                desc: "PropNoble is 100% free and always will be. Every trader deserves access to quality data, regardless of account size or experience level.",
                                 highlights: ['Free forever', 'No sign-up walls', 'Global coverage'],
                             },
                         ].map((item, i) => (
@@ -221,7 +221,7 @@ const AboutUsPage: React.FC = () => {
                 <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
                 <div className="max-w-3xl mx-auto px-4 text-center">
                     <h2 className="text-3xl md:text-4xl font-black text-white mb-4">Ready to Find Your Perfect Firm?</h2>
-                    <p className="text-neutral-400 text-sm mb-8 max-w-lg mx-auto">Join 50,000+ traders who trust PropMatchSpot to compare, save, and get funded — all for free.</p>
+                    <p className="text-neutral-400 text-sm mb-8 max-w-lg mx-auto">Join 50,000+ traders who trust PropNoble to compare, save, and get funded — all for free.</p>
                     <div className="flex flex-col sm:flex-row justify-center gap-4">
                         <Link to="/firms">
                             <button className="group w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-brand-gold to-amber-500 text-black font-bold rounded-2xl transition-all duration-300 shadow-[0_4px_20px_rgba(246,174,19,0.25)]">

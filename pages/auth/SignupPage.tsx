@@ -65,20 +65,18 @@ const SignupPage = () => {
         <div className="min-h-screen bg-brand-dark flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
             {/* Background Decorations */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-brand-gold/10 rounded-full blur-[100px] animate-pulse-slow"></div>
-                <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-gold/5 rounded-full blur-[100px] animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
+                <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-brand-primary/10 rounded-full blur-[100px] animate-pulse-slow"></div>
+                <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-primary/5 rounded-full blur-[100px] animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
             </div>
 
             <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
                 <div className="flex justify-center">
-                    <img
-                        className="h-24 w-auto drop-shadow-glow"
-                        src="http://zainenterprisespakistan.com/wp-content/uploads/2025/12/Untitled-design-28-scaled.png"
-                        alt="Prop Match Spot"
-                    />
+                    <div className="flex items-center drop-shadow-glow">
+                        <img src="/nobel-logo.png" alt="PropNoble" className="h-18 w-auto" />
+                    </div>
                 </div>
                 <h2 className="mt-6 text-center text-3xl font-bold text-white tracking-tight">
-                    Join Prop Match Spot
+                    Join PropNoble
                 </h2>
                 <p className="mt-2 text-center text-sm text-brand-muted">
                     Start your journey to becoming a funded trader
@@ -86,7 +84,7 @@ const SignupPage = () => {
             </div>
 
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-                <div className="bg-brand-surface/80 backdrop-blur-md py-8 px-4 shadow-2xl border border-brand-border rounded-xl sm:px-10">
+                <div className="bg-[#111111]/80 backdrop-blur-md py-8 px-4 shadow-2xl border border-brand-border rounded-xl sm:px-10">
                     <form className="space-y-6" onSubmit={handleSignup}>
                         <div>
                             <label htmlFor="name" className="block text-sm font-medium text-gray-300">
@@ -100,7 +98,7 @@ const SignupPage = () => {
                                     required
                                     value={fullName}
                                     onChange={(e) => setFullName(e.target.value)}
-                                    className="appearance-none block w-full px-4 py-3 border border-brand-border rounded-lg shadow-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold/50 sm:text-sm bg-brand-charcoal text-white transition-all duration-200"
+                                    className="appearance-none block w-full px-4 py-3 border border-brand-border rounded-lg shadow-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary/50 sm:text-sm bg-brand-charcoal text-white transition-all duration-200"
                                     placeholder="John Doe"
                                 />
                             </div>
@@ -119,7 +117,7 @@ const SignupPage = () => {
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="appearance-none block w-full px-4 py-3 border border-brand-border rounded-lg shadow-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold/50 sm:text-sm bg-brand-charcoal text-white transition-all duration-200"
+                                    className="appearance-none block w-full px-4 py-3 border border-brand-border rounded-lg shadow-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary/50 sm:text-sm bg-brand-charcoal text-white transition-all duration-200"
                                     placeholder="name@example.com"
                                 />
                             </div>
@@ -138,7 +136,7 @@ const SignupPage = () => {
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="appearance-none block w-full px-4 py-3 border border-brand-border rounded-lg shadow-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold/50 sm:text-sm bg-brand-charcoal text-white transition-all duration-200"
+                                    className="appearance-none block w-full px-4 py-3 border border-brand-border rounded-lg shadow-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary/50 sm:text-sm bg-brand-charcoal text-white transition-all duration-200"
                                     placeholder="Choose a strong password"
                                 />
                             </div>
@@ -155,11 +153,11 @@ const SignupPage = () => {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-button-glow text-sm font-bold text-brand-black bg-gradient-to-r from-brand-gold to-[#ffd700] hover:from-[#e5a00d] hover:to-[#eec800] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-gold disabled:opacity-50 disabled:cursor-not-allowed transform transition-all duration-200 hover:-translate-y-0.5"
+                                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-button-glow text-sm font-bold text-white bg-gradient-to-r from-brand-primary to-[#ffd700] hover:from-[#e5a00d] hover:to-[#eec800] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary disabled:opacity-50 disabled:cursor-not-allowed transform transition-all duration-200 hover:-translate-y-0.5"
                             >
                                 {loading ? (
                                     <span className="flex items-center">
-                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-brand-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
@@ -202,7 +200,7 @@ const SignupPage = () => {
                                     setLoading(false);
                                 }}
                                 disabled={loading}
-                                className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-brand-border rounded-lg shadow-sm text-sm font-medium text-white bg-brand-charcoal hover:bg-brand-border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-gold transition-all duration-200"
+                                className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-brand-border rounded-lg shadow-sm text-sm font-medium text-white bg-brand-charcoal hover:bg-brand-border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary transition-all duration-200"
                             >
                                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -231,7 +229,7 @@ const SignupPage = () => {
                         <div className="mt-6">
                             <Link
                                 to="/login"
-                                className="w-full flex justify-center py-3 px-4 border border-brand-border rounded-lg shadow-sm text-sm font-medium text-brand-gold bg-brand-charcoal hover:bg-brand-border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-gold transition-all duration-200"
+                                className="w-full flex justify-center py-3 px-4 border border-brand-border rounded-lg shadow-sm text-sm font-medium text-brand-primary bg-brand-charcoal hover:bg-brand-border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary transition-all duration-200"
                             >
                                 Sign in
                             </Link>
@@ -243,7 +241,7 @@ const SignupPage = () => {
             {/* Footer Links */}
             <div className="mt-8 text-center relative z-10">
                 <p className="text-sm text-brand-muted">
-                    <Link to="/" className="hover:text-brand-gold transition-colors">Back to Home</Link>
+                    <Link to="/" className="hover:text-brand-primary transition-colors">Back to Home</Link>
                 </p>
             </div>
         </div>

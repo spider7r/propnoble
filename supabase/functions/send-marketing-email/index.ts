@@ -101,7 +101,7 @@ serve(async (req) => {
 
         } else if (type === 'test') {
             // Test Mode: Send only to admin
-            to = ["admin@propmatchspot.com"];
+            to = ["admin@PropNoble.com"];
         } else {
             // Campaign Mode: Determine Source
 
@@ -174,7 +174,7 @@ serve(async (req) => {
 
             // SAFETY: In production, send to 'bcc' to hide emails from each other
             // 'to' field must have at least one valid email. Usually we put the sender or a 'noreply' there.
-            to = ["admin@propmatchspot.com"];
+            to = ["admin@PropNoble.com"];
 
             // Resend has a limit (usually 50) for BCC per request.
 
@@ -200,7 +200,7 @@ serve(async (req) => {
                         Authorization: `Bearer ${RESEND_API_KEY}`,
                     },
                     body: JSON.stringify({
-                        from: "Prop Match Spot <info@propmatchspot.com>", // Updated to verified domain
+                        from: "PropNoble <info@PropNoble.com>", // Updated to verified domain
                         to: to,
                         bcc: batch, // Current batch
                         subject: subject,

@@ -16,11 +16,9 @@ const Footer: React.FC = () => {
 
           {/* Col 1: Brand (moved from 5th) */}
           <div>
-            <img
-              src="http://zainenterprisespakistan.com/wp-content/uploads/2025/12/Untitled-design-28-scaled.png"
-              alt="Prop Match Spot"
-              className="h-16 w-auto object-contain mb-4"
-            />
+            <div className="flex items-center mb-4">
+              <img src="/nobel-logo.png" alt="PropNoble" className="h-24 w-auto" />
+            </div>
             <p className="text-neutral-500 text-xs leading-relaxed">
               The #1 destination for traders to compare, review, and find the best prop trading firms.
             </p>
@@ -30,10 +28,10 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="text-white font-semibold mb-4">Platform</h4>
             <ul className="space-y-3 text-sm text-neutral-400">
-              <li><Link to="/firms" className="hover:text-brand-gold transition-colors">Browse Firms</Link></li>
-              <li><Link to="/compare" className="hover:text-brand-gold transition-colors">Compare Tool</Link></li>
-              <li><Link to="/offers" className="hover:text-brand-gold transition-colors">Offers & Coupons</Link></li>
-              <li><Link to="/competitions" className="hover:text-brand-gold transition-colors">Competitions</Link></li>
+              <li><Link to="/firms" className="hover:text-brand-primary transition-colors">Browse Firms</Link></li>
+              <li><Link to="/compare" className="hover:text-brand-primary transition-colors">Compare Tool</Link></li>
+              <li><Link to="/offers" className="hover:text-brand-primary transition-colors">Offers & Coupons</Link></li>
+              <li><Link to="/competitions" className="hover:text-brand-primary transition-colors">Competitions</Link></li>
             </ul>
           </div>
 
@@ -41,8 +39,8 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="text-white font-semibold mb-4">Company</h4>
             <ul className="space-y-3 text-sm text-neutral-400">
-              <li><Link to="/about" className="hover:text-brand-gold transition-colors">About Us</Link></li>
-              <li><Link to="/contact" className="hover:text-brand-gold transition-colors">Contact Us</Link></li>
+              <li><Link to="/about" className="hover:text-brand-primary transition-colors">About Us</Link></li>
+              <li><Link to="/contact" className="hover:text-brand-primary transition-colors">Contact Us</Link></li>
             </ul>
           </div>
 
@@ -50,9 +48,9 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="text-white font-semibold mb-4">Legal</h4>
             <ul className="space-y-3 text-sm text-neutral-400">
-              <li><Link to="/terms" className="hover:text-brand-gold transition-colors">Terms of Service</Link></li>
-              <li><Link to="/privacy" className="hover:text-brand-gold transition-colors">Privacy Policy</Link></li>
-              <li><Link to="/risk" className="hover:text-brand-gold transition-colors">Risk Disclosure</Link></li>
+              <li><Link to="/terms" className="hover:text-brand-primary transition-colors">Terms of Service</Link></li>
+              <li><Link to="/privacy" className="hover:text-brand-primary transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/risk" className="hover:text-brand-primary transition-colors">Risk Disclosure</Link></li>
             </ul>
           </div>
 
@@ -61,24 +59,24 @@ const Footer: React.FC = () => {
             <h4 className="text-white font-semibold mb-4">Contact</h4>
             <ul className="space-y-3 text-sm text-neutral-400">
               <li className="flex items-center gap-2">
-                <Mail size={14} className="text-brand-gold shrink-0" />
-                <a href="mailto:support@propmatchspot.com" className="hover:text-brand-gold transition-colors">support@propmatchspot.com</a>
+                <Mail size={14} className="text-brand-primary shrink-0" />
+                <a href="mailto:support@propnoble.com" className="hover:text-brand-primary transition-colors">support@propnoble.com</a>
               </li>
               <li className="flex items-center gap-2">
-                <Phone size={14} className="text-brand-gold shrink-0" />
-                <a href="tel:+918882511483" className="hover:text-brand-gold transition-colors">+91 88825 11483</a>
+                <Phone size={14} className="text-brand-primary shrink-0" />
+                <a href="tel:+918882511483" className="hover:text-brand-primary transition-colors">+91 88825 11483</a>
               </li>
             </ul>
             <div className="flex gap-3 mt-6">
-              <a href="https://x.com/propmatchspot" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-neutral-500 hover:text-brand-gold hover:border-brand-gold/30 transition-all"><Twitter size={14} /></a>
-              <a href="https://discord.gg/nByZq2uRs" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-neutral-500 hover:text-brand-gold hover:border-brand-gold/30 transition-all"><DiscordIcon /></a>
+              <a href="https://x.com/PropNoblex" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-neutral-500 hover:text-brand-primary hover:border-brand-primary/30 transition-all"><Twitter size={14} /></a>
+              <a href="https://discord.gg/propnoble" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-neutral-500 hover:text-brand-primary hover:border-brand-primary/30 transition-all"><DiscordIcon /></a>
             </div>
           </div>
         </div>
 
         <div className="border-t border-neutral-900 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-neutral-600 text-sm">
-            © 2025 Prop Match Spot. All rights reserved.
+            © 2026 PropNoble. All rights reserved.
           </p>
           <div className="flex flex-wrap gap-4 md:gap-6 text-sm text-neutral-600">
             <Link to="/privacy" className="hover:text-neutral-400 transition-colors">Privacy Policy</Link>

@@ -13,9 +13,8 @@
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prop Match Spot</title>
-  <link rel="icon"
-    href="http://zainenterprisespakistan.com/wp-content/uploads/2025/12/Green-Blue-Bold-Modern-Creative-Studio-Logo-1.png" />
+  <title>PropNoble</title>
+  <link rel="icon" href="/nobel-icon.png" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
@@ -33,32 +32,34 @@
           },
           colors: {
             brand: {
-              gold: '#f6ae13',
-              goldHover: '#d9970c',
-              black: '#181611',
-              dark: '#181611',
-              charcoal: '#221c10',
-              surface: '#2a251a',
-              border: '#3a3427',
-              muted: '#bbb19b',
+              primary: '#ff0000',
+              primaryHover: '#cc0000',
+              black: '#000000',
+              dark: '#000000',
+              charcoal: '#0a0a0a',
+              surface: '#111111',
+              border: '#222222',
+              muted: '#9ca3af',
+              gold: '#ff0000', // Alias to maintain compatibility during transition
             },
-            // User requested colors for Admin Dashboard (Synced with Landing Page)
-            primary: "#f6ae13",         // Matches brand.gold
+            // Synced colors for Dashboards
+            primary: "#ff0000",
             "background-light": "#f8f7f5",
-            "background-dark": "#181611", // Matches brand.black (Landing Page Background)
-            "surface-dark": "#221c10",    // Matches brand.charcoal (Card Background)
-            "surface-highlight": "#2a251a", // Matches brand.surface (Hover/Input Background)
-            "border-dark": "#3a3427",     // Matches brand.border
+            "background-dark": "#000000",
+            "surface-dark": "#0a0a0a",
+            "surface-highlight": "#111111",
+            "border-dark": "#222222",
           },
           backgroundImage: {
             'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-            'hero-glow': 'conic-gradient(from 180deg at 50% 50%, #f6ae1333 0deg, transparent 60deg, transparent 300deg, #f6ae1333 360deg)',
-            'gold-gradient': 'linear-gradient(135deg, #f6ae13 0%, #ffd700 50%, #f6ae13 100%)',
+            'hero-glow': 'conic-gradient(from 180deg at 50% 50%, #ff000033 0deg, transparent 60deg, transparent 300deg, #ff000033 360deg)',
+            'red-gradient': 'linear-gradient(135deg, #ff0000 0%, #cc0000 50%, #ff0000 100%)',
+            'gold-gradient': 'linear-gradient(135deg, #ff0000 0%, #cc0000 50%, #ff0000 100%)', // Alias
           },
           boxShadow: {
-            'glow': '0 0 20px -5px rgba(246, 174, 19, 0.3)',
-            'neon': '0 0 30px -5px rgba(246, 174, 19, 0.5)',
-            'button-glow': '0 0 40px -10px rgba(246, 174, 19, 0.6)',
+            'glow': '0 0 20px -5px rgba(255, 0, 0, 0.3)',
+            'neon': '0 0 30px -5px rgba(255, 0, 0, 0.5)',
+            'button-glow': '0 0 40px -10px rgba(255, 0, 0, 0.6)',
           },
           animation: {
             'fade-in-up': 'fadeInUp 0.8s ease-out',
@@ -109,8 +110,8 @@
   </script>
   <style>
     body {
-      background-color: #181611;
-      color: #e5e5e5;
+      background-color: #000000;
+      color: #ffffff;
     }
 
     /* Custom scrollbar */
@@ -119,16 +120,16 @@
     }
 
     ::-webkit-scrollbar-track {
-      background: #181611;
+      background: #000000;
     }
 
     ::-webkit-scrollbar-thumb {
-      background: #3a3427;
+      background: #222222;
       border-radius: 4px;
     }
 
     ::-webkit-scrollbar-thumb:hover {
-      background: #554c3a;
+      background: #333333;
     }
 
     .bg-grid-white {
@@ -156,7 +157,7 @@
       height: 16px;
       width: 16px;
       border-radius: 50%;
-      background: #f6ae13;
+      background: #ff0000;
       cursor: pointer;
       margin-top: -6px;
     }
@@ -165,7 +166,7 @@
       width: 100%;
       height: 4px;
       cursor: pointer;
-      background: #3a3427;
+      background: #222222;
       border-radius: 2px;
     }
 
@@ -182,7 +183,7 @@
     .prose-blog h3 {
       font-size: 1.25rem;
       font-weight: 800;
-      color: #f6ae13;
+      color: #ff0000;
       margin-top: 2rem;
       margin-bottom: 0.75rem;
       line-height: 1.4;
@@ -220,7 +221,7 @@
     }
 
     .prose-blog a {
-      color: #f6ae13;
+      color: #ff0000;
       text-decoration: underline;
       text-underline-offset: 3px;
     }
@@ -230,12 +231,12 @@
     }
 
     .prose-blog blockquote {
-      border-left: 4px solid #f6ae13;
+      border-left: 4px solid #ff0000;
       padding: 1rem 1.5rem;
       margin: 1.5rem 0;
-      background: rgba(246, 174, 19, 0.05);
+      background: rgba(255, 0, 0, 0.05);
       border-radius: 0 0.75rem 0.75rem 0;
-      color: #bbb19b;
+      color: #9ca3af;
       font-style: italic;
     }
 
@@ -246,7 +247,7 @@
     }
 
     .prose-blog hr {
-      border-color: #3a3427;
+      border-color: #222222;
       margin: 2rem 0;
     }
   </style>

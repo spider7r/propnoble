@@ -132,7 +132,7 @@ const PayoutNotification: React.FC = () => {
                     accountSize: accountSizeDisplay,
                     currency: '$',
                     amount: '',
-                    discountCode: 'SPOT',
+                    discountCode: 'NOBLE',
                     savedAmount: '20'
                 };
             }
@@ -146,7 +146,7 @@ const PayoutNotification: React.FC = () => {
                 accountSize: accountSizeDisplay,
                 currency: '$',
                 amount: '',
-                discountCode: 'SPOT', // HARDCODED
+                discountCode: 'NOBLE', // HARDCODED
                 savedAmount: saved.toLocaleString(),
             };
         }

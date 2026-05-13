@@ -29,7 +29,7 @@ const DEFAULT_POST: Partial<BlogPost> = {
   cover_image: '',
   category: 'General',
   tags: [],
-  author: 'Prop Match Spot',
+  author: 'PropNoble',
   read_time: 5,
   meta_title: '',
   meta_description: '',
@@ -241,7 +241,7 @@ const AdminBlogPage: React.FC = () => {
     }
 
     const prompt = `
-      You are the world's leading SEO Content Director for the prop firm review site "Prop Match Spot".
+      You are the world's leading SEO Content Director for the prop firm review site "PropNoble".
       Your task is to write an ultra-competitive, pillar-length blog post that outranks everything on Google.
       
       CONTENT DIRECTIVES:
@@ -257,7 +257,7 @@ const AdminBlogPage: React.FC = () => {
       3. Do NOT wrap the HTML in markdown \`\`\` blocks. Avoid using an <h1> (the meta title handles this).
       4. Break content into highly readable scannable sections with bullet points, bolded key terms, and short paragraphs.
       5. Include an FAQ section formatted with <h3> at the bottom if applicable.
-      6. Include a Call-To-Action (CTA) directing the reader to use the "Prop Match Spot" to compare firms, mentioning the promo code "SPOT" for maximum discounts.
+      6. Include a Call-To-Action (CTA) directing the reader to use the "PropNoble" to compare firms, mentioning the promo code "NOBLE" for maximum discounts.
       7. Provide highly optimized exact Meta Data in your JSON response.
 
       RETURN FORMAT:
@@ -266,7 +266,7 @@ const AdminBlogPage: React.FC = () => {
          "title": "A highly clickable, CTR-optimized SEO title containing the main keyword (max 65 chars)",
          "excerpt": "A short, engaging hook for the blog index listing card (2-3 sentences max)",
          "content": "<p>Raw HTML content starting with the intro...</p><h2>...</h2>",
-         "meta_title": "The exact Google-optimized Title tag (must include Prop Match Spot)",
+         "meta_title": "The exact Google-optimized Title tag (must include PropNoble)",
          "meta_description": "A compelling Google meta description with keywords (max 155 chars)",
          "suggested_tags": ["tag1", "tag2", "tag3", "tag4", "tag5"]
       }
@@ -592,8 +592,8 @@ const AdminBlogPage: React.FC = () => {
                       <div className="flex items-center gap-3 mb-1">
                         <div className="w-7 h-7 bg-brand-gold rounded-full flex items-center justify-center text-black font-bold text-xs">P</div>
                         <div>
-                           <div className="text-[#e8eaed] text-sm">Prop Match Spot</div>
-                           <div className="text-[#9aa0a6] text-xs">https://propmatchspot.com › blog › {editingPost.slug || 'your-slug'}</div>
+                           <div className="text-[#e8eaed] text-sm">PropNoble</div>
+                           <div className="text-[#9aa0a6] text-xs">https://PropNoble.com › blog › {editingPost.slug || 'your-slug'}</div>
                         </div>
                       </div>
                       <div className="text-[#8ab4f8] text-xl font-normal hover:underline cursor-pointer truncate mt-2">{editingPost.meta_title || editingPost.title || 'Enter your highly optimized Meta Title here'}</div>

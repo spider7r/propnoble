@@ -6,7 +6,7 @@ const ContactUsPage: React.FC = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const mailtoLink = `mailto:support@propmatchspot.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`)}`;
+        const mailtoLink = `mailto:support@PropNoble.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`)}`;
         window.location.href = mailtoLink;
     };
 
@@ -34,7 +34,7 @@ const ContactUsPage: React.FC = () => {
                         {/* Contact Info */}
                         <div className="lg:col-span-2 space-y-5">
                             {[
-                                { icon: <Mail size={20} />, title: 'Email Us', value: 'support@propmatchspot.com', href: 'mailto:support@propmatchspot.com' },
+                                { icon: <Mail size={20} />, title: 'Email Us', value: 'support@PropNoble.com', href: 'mailto:support@PropNoble.com' },
                                 { icon: <Phone size={20} />, title: 'Call Us', value: '+91 88825 11483', href: 'tel:+918882511483' },
                                 { icon: <MapPin size={20} />, title: 'Location', value: 'Remote — Serving traders worldwide', href: '' },
                             ].map((item, i) => (

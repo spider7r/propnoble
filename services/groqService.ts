@@ -55,7 +55,7 @@ export const determineGroqMatch = async (prefs: QuizPreferences): Promise<{ firm
 
         // 3. Build prompt
         const prompt = `
-      You are an expert prop trading AI consultant for PropMatchSpot.
+      You are an expert prop trading AI consultant for PropNoble.
       Your task is to analyze the user's preferences and select the SINGLE best firm from our live database.
 
       USER PROFILE:
@@ -98,7 +98,7 @@ export const determineGroqMatch = async (prefs: QuizPreferences): Promise<{ firm
         });
 
         const data = await response.json();
-        console.log("Spot AI Response:", data);
+        console.log("Noble AI Response:", data);
 
         if (data.choices && data.choices[0] && data.choices[0].message) {
             const resultJson = JSON.parse(data.choices[0].message.content);
@@ -110,7 +110,7 @@ export const determineGroqMatch = async (prefs: QuizPreferences): Promise<{ firm
 
         return MOCK_FALLBACK;
     } catch (error) {
-        console.error("Spot AI Error:", error);
+        console.error("Noble AI Error:", error);
         return MOCK_FALLBACK;
     }
 };

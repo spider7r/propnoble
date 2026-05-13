@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS public.blog_posts (
     cover_image TEXT,
     category TEXT DEFAULT 'General',
     tags TEXT[] DEFAULT '{}',
-    author TEXT DEFAULT 'Prop Match Spot',
+    author TEXT DEFAULT 'PropNoble',
     read_time INTEGER DEFAULT 5,
     meta_title TEXT,
     meta_description TEXT,
@@ -74,14 +74,14 @@ INSERT INTO public.blog_posts (title, slug, excerpt, content, cover_image, categ
 <h3>5. Customer Support & Community</h3>
 <p>When you''re in the middle of a challenge, responsive support can make or break your experience. Look for firms with active Discord communities, live chat support, and dedicated account managers.</p>
 
-<h2>Use Prop Match Spot to Compare</h2>
-<p>Instead of manually researching each firm, use <strong>Prop Match Spot</strong> to compare multiple firms side-by-side. Our platform aggregates real data, verified reviews, and exclusive discount codes to help you make the best decision. Use code <strong>SPOT</strong> to save on your next challenge!</p>',
+<h2>Use PropNoble to Compare</h2>
+<p>Instead of manually researching each firm, use <strong>PropNoble</strong> to compare multiple firms side-by-side. Our platform aggregates real data, verified reviews, and exclusive discount codes to help you make the best decision. Use code <strong>SPOT</strong> to save on your next challenge!</p>',
   'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80',
   'Prop Firm Education',
   ARRAY['prop firms', 'trading', 'funded trading', 'beginners guide'],
-  'Prop Match Spot',
+  'PropNoble',
   6,
-  'How to Choose the Best Prop Trading Firm in 2026 | Prop Match Spot',
+  'How to Choose the Best Prop Trading Firm in 2026 | PropNoble',
   'Complete guide to choosing the best proprietary trading firm. Compare evaluation processes, profit splits, payout reliability, and trading rules.',
   'published',
   true
@@ -111,13 +111,13 @@ INSERT INTO public.blog_posts (title, slug, excerpt, content, cover_image, categ
 </ul>
 
 <h2>Compare Drawdown Rules Across Firms</h2>
-<p>Every prop firm has different drawdown thresholds. Use <strong>Prop Match Spot</strong> to compare daily and maximum drawdown limits across all major firms before choosing your challenge.</p>',
+<p>Every prop firm has different drawdown thresholds. Use <strong>PropNoble</strong> to compare daily and maximum drawdown limits across all major firms before choosing your challenge.</p>',
   'https://images.unsplash.com/photo-1642790106117-e829e14a795f?w=800&q=80',
   'Trading Tips',
   ARRAY['drawdown', 'risk management', 'trading rules', 'prop firm challenges'],
-  'Prop Match Spot',
+  'PropNoble',
   5,
-  'Understanding Drawdown Rules: Daily vs Maximum | Prop Match Spot',
+  'Understanding Drawdown Rules: Daily vs Maximum | PropNoble',
   'Learn the critical difference between daily drawdown and maximum drawdown in prop trading challenges. Essential knowledge for funded traders.',
   'published',
   false
@@ -146,13 +146,13 @@ INSERT INTO public.blog_posts (title, slug, excerpt, content, cover_image, categ
 <p>After a losing trade, the urge to immediately "make it back" is overwhelming. This emotional response leads to larger positions, more frequent trades, and compounding losses. Walk away after two consecutive losses.</p>
 
 <h2>Set Yourself Up for Success</h2>
-<p>Browse verified trader reviews on <strong>Prop Match Spot</strong> to learn from other traders'' experiences. Use code <strong>SPOT</strong> for exclusive discounts on your next challenge!</p>',
+<p>Browse verified trader reviews on <strong>PropNoble</strong> to learn from other traders'' experiences. Use code <strong>SPOT</strong> for exclusive discounts on your next challenge!</p>',
   'https://images.unsplash.com/photo-1535320903710-d993d3d77d29?w=800&q=80',
   'Prop Firm Education',
   ARRAY['mistakes', 'evaluation', 'trading psychology', 'tips'],
-  'Prop Match Spot',
+  'PropNoble',
   7,
-  'Top 5 Mistakes During Prop Firm Evaluations | Prop Match Spot',
+  'Top 5 Mistakes During Prop Firm Evaluations | PropNoble',
   'Discover the top 5 mistakes that cause traders to fail their prop firm evaluations and learn proven strategies to avoid them.',
   'published',
   false
@@ -178,16 +178,16 @@ INSERT INTO public.blog_posts (title, slug, excerpt, content, cover_image, categ
 <p>The most successful firms in 2026 are building strong communities. Discord servers, trading competitions, mentorship programs, and social trading features are becoming standard differentiators.</p>
 
 <h3>Trend 5: Transparency & Verified Payouts</h3>
-<p>Traders are demanding more transparency. Platforms like <strong>Prop Match Spot</strong> help by aggregating verified reviews and payout data, making it easier to identify trustworthy firms.</p>
+<p>Traders are demanding more transparency. Platforms like <strong>PropNoble</strong> help by aggregating verified reviews and payout data, making it easier to identify trustworthy firms.</p>
 
 <h2>Stay Ahead of the Curve</h2>
-<p>Follow the Prop Match Spot blog for weekly industry insights and exclusive firm comparisons. Visit our reviews section to read verified trader experiences!</p>',
+<p>Follow the PropNoble blog for weekly industry insights and exclusive firm comparisons. Visit our reviews section to read verified trader experiences!</p>',
   'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=800&q=80',
   'Industry News',
   ARRAY['trends', '2026', 'prop trading', 'industry', 'ai trading'],
-  'Prop Match Spot',
+  'PropNoble',
   4,
-  'Prop Trading in 2026: Key Industry Trends | Prop Match Spot',
+  'Prop Trading in 2026: Key Industry Trends | PropNoble',
   'Discover the top prop trading industry trends for 2026, including AI tools, instant funding, crypto markets, and community-driven platforms.',
   'published',
   false

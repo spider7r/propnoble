@@ -1,9 +1,8 @@
-
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabaseClient';
 import { useModal } from '../context/ModalContext';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Ticket, CheckCircle2, Copy, ExternalLink, Timer, Zap, ShieldCheck } from 'lucide-react';
 
 interface Offer {
   id: string;
@@ -23,24 +22,22 @@ interface Offer {
 }
 
 const OffersPage: React.FC = () => {
-  const { user } = useAuth(); // Destructured user from useAuth
-  const { showModal } = useModal(); // Destructured showModal from useModal
+  const { user } = useAuth();
+  const { showModal } = useModal();
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
-  const [verifying, setVerifying] = useState<string | null>(null); // Added verifying state
-  const [proofFile, setProofFile] = useState<File | null>(null); // Added proofFile state
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchOffers(); // Changed to call fetchOffers directly
+    fetchOffers();
   }, []);
 
-  // Modified fetchOffers to match the provided snippet
   const fetchOffers = async () => {
-    setLoading(true); // Keep loading state consistent with original
+    setLoading(true);
     try {
       const { data, error } = await supabase
         .from('offers')
-        .select('*, firms(name, logo_url, website, affiliate_link)') // Reverted select to original for full data
+        .select('*, firms(name, logo_url, website, affiliate_link)')
         .eq('status', 'active')
         .order('verified', { ascending: false })
         .order('created_at', { ascending: false });
@@ -54,155 +51,186 @@ const OffersPage: React.FC = () => {
     }
   };
 
-  // Added copyCode function
   const copyCode = (code: string) => {
     navigator.clipboard.writeText(code);
+    setCopiedCode(code);
     showModal({ type: 'success', title: 'Copied!', message: `Promo code ${code} copied to clipboard.` });
-  };
-
-  // Added handleVerify function
-  const handleVerify = async (offerId: string) => {
-    if (!user) {
-      showModal({ type: 'info', title: 'Login Required', message: 'Please log in to submit verification.' });
-      return;
-    }
-    if (!proofFile) {
-      showModal({ type: 'warning', title: 'Missing Proof', message: 'Please upload a screenshot of your purchase.' });
-      return;
-    }
-
-    const fileName = `${user.id}/${Date.now()}_proof.jpg`;
-    const { error: uploadError } = await supabase.storage.from('proofs').upload(fileName, proofFile);
-
-    if (uploadError) {
-      showModal({ type: 'error', title: 'Upload Failed', message: 'Failed to upload proof. Please try again.' });
-      return;
-    }
-
-    const { error: insertError } = await supabase.from('offer_verifications').insert({
-      user_id: user.id,
-      offer_id: offerId,
-      proof_url: fileName,
-      status: 'pending'
-    });
-
-    if (insertError) {
-      showModal({ type: 'error', title: 'Submission Failed', message: 'Failed to submit verification.' });
-    } else {
-      showModal({ type: 'success', title: 'Submitted', message: 'Verification request submitted! We will review it shortly.' });
-      setVerifying(null);
-      setProofFile(null);
-    }
+    setTimeout(() => setCopiedCode(null), 3000);
   };
 
   return (
-    <div className="pt-24 pb-20 min-h-screen bg-brand-black">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-8 pb-10">
-        {/* Page Heading */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div className="flex flex-col gap-2">
-            <h2 className="text-white text-3xl md:text-4xl font-black tracking-tight">Exclusive Prop Firm Deals</h2>
-            <p className="text-brand-muted text-base">Verified discounts for premium trading accounts.</p>
+    <div className="pt-36 pb-24 min-h-screen bg-black relative overflow-hidden">
+      {/* Background Ambience */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-5%] right-[-5%] w-[40%] h-[40%] bg-brand-primary/10 rounded-full blur-[120px] animate-aurora"></div>
+        <div className="absolute bottom-[10%] left-[-5%] w-[30%] h-[30%] bg-brand-primary/5 rounded-full blur-[120px] animate-aurora-reverse"></div>
+        <div className="absolute inset-0 bg-grid-white opacity-[0.02]"></div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Hero Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-primary/10 border border-brand-primary/20 text-brand-primary text-[10px] font-black uppercase tracking-widest mb-6 animate-fade-in-up">
+              <Zap size={14} /> VIP Trading Benefits
+            </div>
+            <h1 className="text-5xl md:text-6xl font-black text-white mb-6 tracking-tight uppercase animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+              Exclusive <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary via-red-500 to-amber-500">Deals</span>
+            </h1>
+            <p className="text-brand-muted text-lg font-medium leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+              Unlock massive savings on the world's most reputable prop firms. 
+              Our team negotiates directly with firms to bring you the best discounts and exclusive bonuses.
+            </p>
           </div>
-          <div className="flex items-center gap-2 text-sm text-brand-gold bg-brand-gold/10 px-3 py-1.5 rounded-full border border-brand-gold/20">
-            <span className="material-symbols-outlined text-[18px]">verified</span>
-            <span className="font-medium">{offers.filter(o => o.verified).length} Active Offers Verified Today</span>
+          
+          <div className="bg-[#0a0a0a] border border-[#1f1f1f] p-6 rounded-3xl flex flex-col items-center gap-2 shadow-2xl animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+             <div className="flex items-center gap-2 text-brand-primary">
+                <ShieldCheck size={20} />
+                <span className="text-xl font-black">{offers.filter(o => o.verified).length}</span>
+             </div>
+             <span className="text-[10px] font-black uppercase tracking-widest text-neutral-500 text-center">Verified Offers<br/>Available Today</span>
           </div>
         </div>
 
-        {/* Featured Hero Card (Static for now, could be dynamic later) */}
-        <div className="rounded-xl border border-brand-gold/30 bg-gradient-to-r from-brand-charcoal via-[#2a2212] to-brand-charcoal p-6 md:p-8 relative overflow-hidden group shadow-lg shadow-black/50">
-          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-brand-gold/10 blur-[80px] pointer-events-none"></div>
+        {/* Featured Deal Spotlight */}
+        <div className="mb-16 relative group animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-primary/20 via-transparent to-brand-primary/10 blur-[50px] opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+          <div className="relative rounded-[40px] border border-white/5 bg-gradient-to-br from-[#0d0d0d] to-[#050505] p-8 md:p-12 overflow-hidden shadow-2xl">
+            {/* Animated background elements */}
+            <div className="absolute -right-20 -top-20 w-80 h-80 bg-brand-primary/20 rounded-full blur-[100px] animate-pulse-slow"></div>
+            <div className="absolute inset-0 bg-grid-white opacity-[0.03]"></div>
 
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
-            <div className="flex flex-col gap-4 max-w-2xl">
-              <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-gold text-brand-black uppercase tracking-wider">Deal of the Month</span>
-                <span className="text-brand-muted text-sm flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[14px]">timer</span> Limited Time
-                </span>
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-12 relative z-10">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="px-4 py-1 rounded-full bg-brand-primary text-white text-[10px] font-black uppercase tracking-widest animate-shine relative overflow-hidden">
+                    Deal of the Month
+                  </span>
+                  <span className="text-amber-500 text-sm font-bold flex items-center gap-1.5 uppercase tracking-wider">
+                    <Timer size={14} /> Limited availability
+                  </span>
+                </div>
+                <h2 className="text-4xl md:text-6xl font-black text-white leading-tight mb-6">
+                  SUPERCHARGE YOUR <br/>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-amber-500">TRADING JOURNEY</span>
+                </h2>
+                <p className="text-brand-muted text-xl font-medium max-w-xl mb-8">
+                  Get up to 30% discount on all challenge phases this week only. Use code <span className="text-white font-black">NOBLE</span> for maximum benefit.
+                </p>
+                <div className="flex flex-wrap gap-4">
+                  <button className="px-10 py-4 rounded-2xl bg-white text-black font-black text-sm uppercase tracking-widest hover:bg-brand-primary hover:text-white transition-all duration-300 shadow-xl active:scale-[0.98]">
+                    Browse All Rewards
+                  </button>
+                </div>
               </div>
-              <h3 className="text-3xl md:text-5xl font-black text-white leading-tight">
-                <span className="text-brand-gold">Save Big</span> on Top Firms
-              </h3>
-              <p className="text-brand-muted text-lg">Check out our verified list of prop firm coupons below.</p>
+              
+              {/* Graphic Element */}
+              <div className="hidden lg:flex items-center justify-center relative w-64 h-64">
+                <div className="absolute inset-0 bg-brand-primary/30 rounded-full blur-3xl animate-breathing-glow"></div>
+                <Ticket size={160} className="text-brand-primary transform -rotate-12 drop-shadow-[0_0_30px_rgba(255,0,0,0.5)] animate-float" />
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-wrap items-center gap-3">
-          <button className="flex h-9 items-center gap-2 rounded-lg bg-brand-gold/10 border border-brand-gold/20 px-4 transition-colors hover:bg-brand-gold/20">
-            <span className="text-sm font-medium text-brand-gold">All Offers</span>
+        {/* Filters / Categories */}
+        <div className="flex items-center gap-4 mb-12 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+          <button className="px-6 py-2.5 rounded-xl bg-brand-primary text-white text-xs font-black uppercase tracking-widest shadow-[0_0_20px_rgba(255,0,0,0.2)]">
+            All Offers
+          </button>
+          <button className="px-6 py-2.5 rounded-xl bg-[#0a0a0a] border border-[#1f1f1f] text-neutral-500 text-xs font-black uppercase tracking-widest hover:text-white hover:border-white/20 transition-all">
+            Top Discounts
+          </button>
+          <button className="px-6 py-2.5 rounded-xl bg-[#0a0a0a] border border-[#1f1f1f] text-neutral-500 text-xs font-black uppercase tracking-widest hover:text-white hover:border-white/20 transition-all">
+            New Arrivals
           </button>
         </div>
 
         {/* Offer Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {loading ? (
-            <div className="col-span-full flex flex-col items-center justify-center py-20 text-brand-muted gap-3">
-              <Loader2 className="animate-spin" size={32} />
-              <p>Loading live offers...</p>
+            <div className="col-span-full flex flex-col items-center justify-center py-32 text-brand-muted gap-6 animate-fade-in-up">
+              <div className="w-12 h-12 border-4 border-brand-primary/20 border-t-brand-primary rounded-full animate-spin"></div>
+              <p className="font-black uppercase tracking-widest text-xs">Accessing Market Deals...</p>
             </div>
           ) : offers.length > 0 ? (
-            offers.map((offer) => (
-              <div key={offer.id} className="group flex flex-col justify-between gap-4 rounded-xl border border-brand-border bg-brand-charcoal p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/30 hover:shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
-                <div>
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="h-12 w-12 rounded-lg bg-white/5 flex items-center justify-center border border-white/10 overflow-hidden">
-                        {offer.firms?.logo_url ? (
-                          <img src={offer.firms.logo_url} alt={offer.firms.name} className="w-full h-full object-contain p-1" />
-                        ) : (
-                          <div className="font-bold text-white text-xs">{offer.firms?.name?.substring(0, 2)}</div>
-                        )}
-                      </div>
-                      <div>
-                        <h4 className="text-white font-bold text-lg leading-tight">{offer.firms?.name || 'Unknown Firm'}</h4>
-                        <p className="text-xs text-brand-muted">Prop Firm</p>
+            offers.map((offer, idx) => (
+              <div 
+                key={offer.id} 
+                className="group relative flex flex-col bg-[#0a0a0a] border border-[#1f1f1f] rounded-[32px] p-8 transition-all duration-500 hover:border-brand-primary/40 hover:shadow-[0_20px_60px_rgba(0,0,0,0.6)] animate-fade-in-up"
+                style={{ animationDelay: `${0.6 + idx * 0.1}s` }}
+              >
+                {/* Visual Accent */}
+                <div className="absolute top-0 right-10 w-20 h-px bg-gradient-to-r from-transparent via-brand-primary to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                <div className="flex justify-between items-start mb-8">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-2xl bg-[#111] p-3 border border-[#1f1f1f] flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform duration-500 shadow-inner">
+                      {offer.firms?.logo_url ? (
+                        <img src={offer.firms.logo_url} alt={offer.firms.name} className="w-full h-full object-contain" />
+                      ) : (
+                        <div className="font-black text-brand-primary text-xl">{offer.firms?.name?.substring(0, 1)}</div>
+                      )}
+                    </div>
+                    <div>
+                      <h4 className="text-white font-black text-lg tracking-tight leading-tight uppercase">{offer.firms?.name || 'Unknown Firm'}</h4>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <CheckCircle2 size={12} className="text-brand-primary" />
+                        <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest">Authorized Partner</span>
                       </div>
                     </div>
-                    {offer.verified && (
-                      <span className="px-2 py-1 rounded bg-green-500/10 text-green-500 text-[10px] font-bold uppercase tracking-wide border border-green-500/20">Verified</span>
-                    )}
                   </div>
-                  <div className="flex flex-col gap-1 mb-4">
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-black text-white group-hover:text-brand-gold transition-colors">{offer.discount || 'Special Deal'}</span>
+                  
+                  {offer.verified && (
+                    <div className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase tracking-widest">
+                       Verified
                     </div>
-                    <p className="text-sm text-brand-muted">{offer.title}</p>
-                  </div>
+                  )}
                 </div>
-                <div className="flex flex-col gap-3">
-                  <div className="flex justify-between items-center text-xs text-brand-muted border-t border-brand-border pt-3">
+
+                <div className="flex flex-col gap-2 mb-8">
+                  <div className="text-5xl font-black text-white tracking-tighter group-hover:text-brand-primary transition-colors duration-500 uppercase">
+                    {offer.discount || 'PROMO'}
+                  </div>
+                  <p className="text-neutral-400 font-medium text-sm leading-relaxed">{offer.title}</p>
+                </div>
+
+                <div className="mt-auto">
+                  {/* Expiry Info */}
+                  <div className="flex items-center gap-2 text-[10px] text-neutral-500 font-bold uppercase tracking-widest mb-6 py-3 border-t border-[#1f1f1f]">
+                    <Timer size={12} />
                     {offer.expiry_date ? (
-                      <span className="flex items-center gap-1">
-                        <span className="material-symbols-outlined text-[14px]">calendar_month</span> Valid until {new Date(offer.expiry_date).toLocaleDateString()}
-                      </span>
+                      <span>Valid until {new Date(offer.expiry_date).toLocaleDateString()}</span>
                     ) : (
-                      <span className="text-brand-muted/50">No expiration date</span>
+                      <span>Active Indefinitely</span>
                     )}
                   </div>
-                  <div className="flex gap-2">
+
+                  <div className="flex gap-3">
                     <a
                       href={offer.firms?.affiliate_link || offer.firms?.website || '#'}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex-1 bg-white hover:bg-gray-200 text-black font-bold py-2.5 rounded-lg text-sm transition-colors text-center"
+                      className="flex-1 h-12 flex items-center justify-center rounded-xl bg-white text-black font-black text-xs uppercase tracking-widest hover:bg-brand-primary hover:text-white transition-all duration-300 shadow-lg active:scale-[0.95]"
                     >
-                      Claim Offer
+                      Activate <ExternalLink size={14} className="ml-1.5" />
                     </a>
+                    
                     {offer.code && (
                       <button
-                        className="px-3 rounded-lg border border-brand-border bg-brand-black text-brand-muted hover:text-white hover:border-brand-gold/50 transition-colors flex items-center justify-center group/copy"
-                        title="Copy Code"
-                        onClick={() => {
-                          navigator.clipboard.writeText(offer.code || '');
-                          alert('Code copied!');
-                        }}
+                        className={`h-12 px-5 rounded-xl border font-black text-xs uppercase tracking-widest transition-all duration-500 flex items-center justify-center gap-2 active:scale-[0.95] ${
+                          copiedCode === offer.code 
+                          ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
+                          : 'bg-[#0d0d0d] border-[#1f1f1f] text-neutral-400 hover:text-white hover:border-white/20'
+                        }`}
+                        onClick={() => copyCode(offer.code || '')}
                       >
-                        <span className="material-symbols-outlined text-[18px]">content_copy</span>
-                        <div className="hidden group-hover/copy:block absolute bottom-full mb-2 bg-black text-white text-xs px-2 py-1 rounded">Copy</div>
+                        {copiedCode === offer.code ? (
+                          <CheckCircle2 size={16} />
+                        ) : (
+                          <Copy size={16} />
+                        )}
+                        {copiedCode === offer.code ? 'Copied' : 'Code'}
                       </button>
                     )}
                   </div>
@@ -210,9 +238,12 @@ const OffersPage: React.FC = () => {
               </div>
             ))
           ) : (
-            <div className="col-span-full py-20 text-center">
-              <h3 className="text-xl font-bold text-white mb-2">No Active Offers</h3>
-              <p className="text-brand-muted">Check back later for new deals or add some in the Admin Dashboard.</p>
+            <div className="col-span-full py-32 text-center flex flex-col items-center animate-fade-in-up">
+              <div className="w-20 h-20 rounded-full bg-[#0a0a0a] border border-[#1f1f1f] flex items-center justify-center text-neutral-700 mb-8 shadow-inner">
+                <Zap size={40} />
+              </div>
+              <h3 className="text-white font-black text-2xl uppercase tracking-tight mb-3">No Active Campaigns</h3>
+              <p className="text-neutral-500 font-medium max-w-sm">We're currently negotiating new deals. Sign up for our newsletter to get notified first.</p>
             </div>
           )}
         </div>

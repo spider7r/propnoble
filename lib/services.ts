@@ -59,7 +59,7 @@ export const mapFirmFromDB = (dbFirm: any): PropFirm => {
         website: dbFirm.website || dbFirm.website_url,
         websiteUrl: dbFirm.website_url || dbFirm.website,
         affiliateLink: dbFirm.affiliate_link,
-        discountCode: dbFirm.discount_code || '',
+        discountCode: (dbFirm.discount_code === 'SPOT' ? 'NOBLE' : dbFirm.discount_code) || 'NOBLE',
         logo: dbFirm.logo_url || 'https://placehold.co/400x400/181611/F6AE13?text=No+Logo',
         favicon: dbFirm.favicon || null,
         rating: Number(dbFirm.rating) || 4.5,

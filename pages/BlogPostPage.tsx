@@ -52,7 +52,7 @@ const BlogPostPage: React.FC = () => {
           setPost(data);
 
           // Update document title for SEO
-          document.title = data.meta_title || `${data.title} | Prop Match Spot Blog`;
+          document.title = data.meta_title || `${data.title} | PropNoble Blog`;
 
           // Fetch related posts (same category, excluding current)
           const { data: related } = await supabase

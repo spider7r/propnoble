@@ -5,15 +5,16 @@ import { useComparison } from '../context/ComparisonContext';
 import { formatFunding } from '../lib/format';
 import FirmLogo from './FirmLogo';
 import PlatformLogo from './PlatformLogo';
-import { ArrowUpRight, GitCompareArrows } from 'lucide-react';
+import { ArrowUpRight, GitCompareArrows, Star, CheckCircle } from 'lucide-react';
 import { generateSlug } from '../lib/services';
 
 interface FirmCardProps {
   firm: PropFirm;
   className?: string;
+  rank?: number;
 }
 
-const FirmCard: React.FC<FirmCardProps> = ({ firm, className }) => {
+const FirmCard: React.FC<FirmCardProps> = ({ firm, className, rank }) => {
   const { toggleFirm, isInComparison } = useComparison();
   const isSelected = isInComparison(firm.id);
 
@@ -34,115 +35,121 @@ const FirmCard: React.FC<FirmCardProps> = ({ firm, className }) => {
   const splitNum = parseInt(firm.profitSplit?.replace('%', '') || '80');
 
   return (
-    <article className={`group relative rounded-2xl overflow-hidden flex flex-col h-full transition-all duration-500 hover:translate-y-[-4px] ${className || ''}`}>
-      {/* Card Border Gradient */}
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/[0.08] via-white/[0.04] to-white/[0.02] group-hover:from-brand-gold/30 group-hover:via-brand-gold/10 group-hover:to-transparent transition-all duration-500 pointer-events-none z-0"></div>
+    <article className={`relative rounded-xl bg-[#0a0a0a] border border-[#1f1f1f] flex flex-col h-full transition-all duration-300 hover:border-[#333] hover:shadow-2xl hover:-translate-y-1 ${className || ''}`}>
+      
+      {/* Rank Badge */}
+      {rank && (
+        <div className={`absolute -top-3 -left-3 px-3 py-1 rounded-md font-black text-xs z-20 shadow-lg flex items-center gap-1 ${
+          rank === 1 ? 'bg-gradient-to-r from-amber-500 to-amber-400 text-black' : 
+          rank === 2 ? 'bg-gradient-to-r from-neutral-200 to-neutral-300 text-black' : 
+          rank === 3 ? 'bg-gradient-to-r from-amber-700 to-amber-600 text-white' : 
+          'bg-[#1f1f1f] text-neutral-400 border border-[#333]'
+        }`}>
+          {rank === 1 && <span className="text-[10px]">👑</span>}
+          #{rank}
+        </div>
+      )}
 
-      {/* Card Inner */}
-      <div className="absolute inset-[1px] rounded-2xl bg-[#0f0e0b] z-[1]"></div>
-
-      {/* Content */}
-      <div className="relative z-[2] flex-1 flex flex-col">
-        {/* Top Section: Logo + Name + Rating */}
-        <div className="p-5 pb-4">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-3.5">
-              <div className="relative">
-                  <FirmLogo
-                    src={iconUrl}
-                    fallbackSrc={firm.logo}
-                    alt={firm.name}
-                    size="md"
-                    className="rounded-xl border border-white/10 group-hover:border-brand-gold/30 transition-colors w-12 h-12"
-                  />
-              </div>
-              <div>
-                <h3 className="font-bold text-[15px] leading-tight text-white group-hover:text-brand-gold transition-colors duration-300">{firm.name}</h3>
-                <div className="flex items-center gap-1.5 mt-1.5">
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                    Verified
-                  </span>
-                  {firm.trustScore > 95 && (
-                    <span className="px-2 py-0.5 rounded-md text-[9px] font-bold uppercase bg-purple-500/10 text-purple-400 border border-purple-500/20">Top Tier</span>
-                  )}
-                </div>
-              </div>
-            </div>
-            {/* Rating */}
-            <div className="text-right shrink-0">
-              <div className="bg-white/[0.04] border border-white/[0.06] rounded-lg px-2.5 py-1.5 group-hover:border-brand-gold/20 transition-colors">
-                <div className="flex items-center gap-0.5 text-brand-gold text-[13px] justify-center">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <span key={star} className="material-symbols-outlined fill-current text-[14px]">
-                      {firm.rating >= star ? 'star' : (firm.rating >= star - 0.5 ? 'star_half' : 'star_border')}
-                    </span>
-                  ))}
-                </div>
-                <div className="text-[10px] font-semibold text-neutral-400 mt-0.5 text-center">{firm.rating}/5 ({firm.reviewCount})</div>
+      {/* Top Header Section */}
+      <div className="p-5 pb-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex gap-3">
+            <FirmLogo
+              src={iconUrl}
+              fallbackSrc={firm.logo}
+              alt={firm.name}
+              size="sm"
+              className="rounded-lg w-12 h-12 object-cover bg-[#111] border border-[#222]"
+            />
+            
+            <div className="pt-0.5 flex flex-col justify-center">
+              <h3 className="font-bold text-[15px] text-white tracking-tight leading-tight mb-1.5">{firm.name}</h3>
+              <div className="flex items-center gap-1.5">
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <CheckCircle size={8} strokeWidth={3} />
+                  Verified
+                </span>
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Stats Row */}
-        <div className="px-5 pb-4">
-          <div className="grid grid-cols-3 gap-2">
-            {[
-              { label: 'Max Fund', value: formatFunding(firm.maxFunding), color: 'text-white' },
-              { label: 'Profit Split', value: `${firm.profitSplit ? firm.profitSplit.replace('%', '') : '80'}%`, color: 'text-brand-gold' },
-              { label: 'Drawdown', value: firm.drawdown || '10%', color: 'text-white' },
-            ].map((stat, i) => (
-              <div key={i} className="bg-white/[0.02] border border-white/[0.05] rounded-xl px-3 py-2.5 text-center group-hover:border-white/[0.08] transition-colors">
-                <div className={`text-sm font-bold tabular-nums ${stat.color}`}>{stat.value}</div>
-                <div className="text-[9px] uppercase tracking-wider text-neutral-500 font-semibold mt-0.5">{stat.label}</div>
-              </div>
-            ))}
+          
+          <div className="flex flex-col items-end">
+            <div className="flex items-center gap-[1px] mb-1">
+              {[1, 2, 3, 4, 5].map((s) => (
+                <Star key={s} size={11} className={s <= Math.round(firm.rating) ? "text-brand-primary fill-brand-primary" : "text-[#222] fill-[#222]"} />
+              ))}
+            </div>
+            <span className="text-[10px] font-bold text-neutral-400">{firm.rating}/5 ({firm.reviewCount || 0})</span>
           </div>
         </div>
+      </div>
 
-        {/* Profit Split Visual Bar */}
-        <div className="px-5 pb-4">
-          <div className="flex items-center justify-between text-[10px] mb-1.5">
-            <span className="text-neutral-500 font-medium">Profit Split</span>
-            <span className="text-brand-gold font-bold">{splitNum}%</span>
+      {/* Stats Section */}
+      <div className="px-5 pb-4">
+        <div className="grid grid-cols-3 gap-2">
+          {/* Max Fund */}
+          <div className="bg-[#111] border border-[#1f1f1f] rounded-lg py-3 flex flex-col items-center justify-center">
+            <span className="block text-sm font-bold text-white mb-0.5">{formatFunding(firm.maxFunding)}</span>
+            <span className="block text-[8px] uppercase tracking-wider text-neutral-500 font-bold">Max Fund</span>
           </div>
-          <div className="w-full bg-white/[0.04] rounded-full h-1.5 overflow-hidden">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-brand-gold to-amber-400 transition-all duration-1000"
-              style={{ width: `${splitNum}%` }}
-            ></div>
+          {/* Profit Split */}
+          <div className="bg-[#111] border border-[#1f1f1f] rounded-lg py-3 flex flex-col items-center justify-center">
+            <span className="block text-sm font-bold text-brand-primary mb-0.5">{splitNum}%</span>
+            <span className="block text-[8px] uppercase tracking-wider text-neutral-500 font-bold">Profit Split</span>
           </div>
-        </div>
-
-        {/* Platform Tags */}
-        <div className="px-5 pb-4 mt-auto">
-          <div className="flex flex-wrap gap-1.5">
-            {((firm.tags && firm.tags.length > 0 ? firm.tags : firm.platforms) || []).slice(0, 4).map((tag, idx) => (
-              <PlatformLogo key={idx} platform={tag} size="sm" />
-            ))}
+          {/* Drawdown */}
+          <div className="bg-[#111] border border-[#1f1f1f] rounded-lg py-3 flex flex-col items-center justify-center">
+            <span className="block text-sm font-bold text-white mb-0.5">{firm.drawdown || '10%'}</span>
+            <span className="block text-[8px] uppercase tracking-wider text-neutral-500 font-bold">Drawdown</span>
           </div>
         </div>
+      </div>
 
-        {/* Action Footer */}
-        <div className="px-4 py-3.5 border-t border-white/[0.05] flex items-center gap-2.5 mt-auto">
-          <Link to={`/firm/${generateSlug(firm.name)}`} className="flex-1">
-            <button className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-brand-gold to-amber-500 hover:from-amber-500 hover:to-brand-gold text-black font-bold text-sm py-2.5 rounded-xl transition-all duration-300 shadow-[0_4px_15px_rgba(246,174,19,0.2)] hover:shadow-[0_4px_20px_rgba(246,174,19,0.35)]">
-              View Firm
-              <ArrowUpRight size={15} strokeWidth={2.5} />
-            </button>
-          </Link>
-          <button
-            onClick={() => toggleFirm(firm)}
-            className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-300 border ${isSelected
-                ? 'bg-brand-gold/10 border-brand-gold/30 text-brand-gold'
-                : 'bg-white/[0.03] border-white/[0.08] text-neutral-400 hover:border-brand-gold/20 hover:text-white'
-              }`}
-          >
-            <GitCompareArrows size={14} />
-            {isSelected ? 'Added' : 'Compare'}
+      {/* Visual Profit Split Bar */}
+      <div className="px-5 pb-4">
+        <div className="flex justify-between items-center mb-1.5">
+          <span className="text-[9px] text-neutral-500 font-semibold uppercase tracking-wider">Profit Split</span>
+          <span className="text-[10px] text-brand-primary font-bold">{splitNum}%</span>
+        </div>
+        <div className="h-1.5 w-full bg-[#1f1f1f] rounded-full overflow-hidden">
+          <div 
+            className="h-full rounded-full bg-brand-primary"
+            style={{ width: `${splitNum}%` }}
+          ></div>
+        </div>
+      </div>
+
+      {/* Platform Tags */}
+      <div className="px-5 pb-4 mt-auto">
+        <div className="flex flex-wrap gap-1.5">
+          {((firm.tags && firm.tags.length > 0 ? firm.tags : firm.platforms) || []).slice(0, 4).map((tag, idx) => (
+            <span key={idx} className="px-2 py-1 rounded bg-[#111] border border-[#222] text-[9px] font-bold text-neutral-300 uppercase tracking-wide">
+              {tag}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer Actions */}
+      <div className="px-5 pb-5 mt-auto flex items-center gap-3">
+        <Link to={`/firm/${generateSlug(firm.name)}`} className="flex-1">
+          <button className="w-full h-10 flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-brand-primary to-[#ff6b00] hover:from-[#ff6b00] hover:to-brand-primary text-white font-bold text-[13px] transition-all shadow-[0_0_15px_rgba(255,51,0,0.15)]">
+            View Firm
+            <ArrowUpRight size={14} strokeWidth={2.5} />
           </button>
-        </div>
+        </Link>
+        
+        <button
+          onClick={() => toggleFirm(firm)}
+          className={`shrink-0 w-[100px] h-10 flex items-center justify-center gap-1.5 rounded-lg border font-bold text-[11px] transition-all ${
+            isSelected
+            ? 'bg-brand-primary/10 border-brand-primary/30 text-brand-primary'
+            : 'bg-[#111] border-[#333] text-neutral-400 hover:bg-[#1a1a1a] hover:text-white'
+          }`}
+        >
+          <GitCompareArrows size={14} />
+          {isSelected ? 'Added' : 'Compare'}
+        </button>
       </div>
     </article>
   );

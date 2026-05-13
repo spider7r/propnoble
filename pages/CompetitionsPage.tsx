@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabaseClient'; // Ensure this path is correct
-import { Trophy, Calendar, DollarSign, ExternalLink, Timer, Filter, ArrowRight } from 'lucide-react';
+import { supabase } from '../lib/supabaseClient';
+import { Trophy, Calendar, DollarSign, ArrowRight, Timer, Zap } from 'lucide-react';
 import Button from '../components/Button';
 import { Link } from 'react-router-dom';
 
@@ -36,7 +36,6 @@ const CompetitionsPage = () => {
                 .order('start_date', { ascending: true });
 
             if (error) throw error;
-            console.log("Supabase Competitions Data:", data); // DEBUG
             setCompetitions(data || []);
         } catch (error) {
             console.error('Error fetching competitions:', error);
@@ -62,38 +61,42 @@ const CompetitionsPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-brand-dark pt-36 pb-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-            {/* Background Gradients */}
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                <div className="absolute top-[10%] left-[20%] w-[30%] h-[30%] bg-brand-gold/5 rounded-full blur-[120px]"></div>
-                <div className="absolute bottom-[10%] right-[20%] w-[30%] h-[30%] bg-blue-500/5 rounded-full blur-[120px]"></div>
+        <div className="min-h-screen bg-black pt-36 pb-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+            {/* Premium Background Effects */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-brand-primary/10 rounded-full blur-[150px] animate-aurora"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-brand-primary/5 rounded-full blur-[150px] animate-aurora-reverse"></div>
+                <div className="absolute inset-0 bg-grid-white opacity-[0.02]"></div>
             </div>
 
             <div className="max-w-7xl mx-auto relative z-10">
-                {/* Header */}
-                <div className="text-center mb-16">
-                    <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                        Trading <span className="text-brand-gold">Competitions</span>
+                {/* Hero Header */}
+                <div className="text-center mb-20">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-primary/10 border border-brand-primary/20 text-brand-primary text-xs font-bold uppercase tracking-widest mb-6 animate-fade-in-up">
+                        <Trophy size={14} /> Elite Trading Events
+                    </div>
+                    <h1 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tight uppercase animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+                        Trading <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary via-red-500 to-amber-500">Competitions</span>
                     </h1>
-                    <p className="text-brand-muted text-lg max-w-2xl mx-auto">
-                        Test your skills, compete with others, and win funded accounts or cash prizes.
-                        Join the most exciting trading events in the industry.
+                    <p className="text-brand-muted text-lg md:text-xl max-w-3xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+                        Join the arena where the world's best traders compete for glory and massive capital. 
+                        Test your strategy, dominate the leaderboard, and win funded accounts up to $1M.
                     </p>
                 </div>
 
-                {/* Filters */}
-                <div className="flex justify-center mb-12">
-                    <div className="bg-brand-surface border border-brand-border p-1.5 rounded-xl flex gap-2">
+                {/* Glassmorphism Filters */}
+                <div className="flex justify-center mb-16 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+                    <div className="bg-[#0a0a0a]/80 backdrop-blur-xl border border-white/5 p-1.5 rounded-2xl flex gap-1 shadow-2xl">
                         {(['all', 'active', 'upcoming'] as const).map((f) => (
                             <button
                                 key={f}
                                 onClick={() => setFilter(f)}
-                                className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${filter === f
-                                    ? 'bg-brand-gold text-black shadow-lg shadow-brand-gold/20'
-                                    : 'text-brand-muted hover:text-white hover:bg-white/5'
+                                className={`px-8 py-3 rounded-xl text-sm font-black transition-all duration-500 uppercase tracking-wider ${filter === f
+                                    ? 'bg-brand-primary text-white shadow-[0_0_20px_rgba(255,0,0,0.3)]'
+                                    : 'text-neutral-500 hover:text-white hover:bg-white/5'
                                     }`}
                             >
-                                {f.charAt(0).toUpperCase() + f.slice(1)}
+                                {f}
                             </button>
                         ))}
                     </div>
@@ -101,94 +104,122 @@ const CompetitionsPage = () => {
 
                 {/* Loading State */}
                 {loading && (
-                    <div className="flex justify-center py-20">
-                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-brand-gold"></div>
+                    <div className="flex flex-col items-center justify-center py-32">
+                        <div className="relative w-16 h-16">
+                            <div className="absolute inset-0 rounded-full border-t-2 border-brand-primary animate-spin"></div>
+                            <div className="absolute inset-2 rounded-full border-b-2 border-brand-primary opacity-50 animate-spin-slow"></div>
+                        </div>
+                        <p className="mt-6 text-brand-muted font-bold tracking-widest uppercase text-xs animate-pulse">Synchronizing Data...</p>
                     </div>
                 )}
 
-                {/* Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {filteredCompetitions.map((comp) => (
-                        <div
-                            key={comp.id}
-                            className="group bg-brand-surface border border-brand-border rounded-2xl overflow-hidden hover:border-brand-gold/50 transition-all duration-300 hover:shadow-2xl hover:shadow-brand-gold/10 flex flex-col h-full"
-                        >
-                            {/* Image Banner */}
-                            <div className="h-48 bg-brand-charcoal relative overflow-hidden p-6 flex items-center justify-center">
-                                <div className="absolute inset-0 bg-gradient-to-t from-brand-surface to-transparent opacity-60"></div>
-                                <img
-                                    src={comp.image_url || 'https://via.placeholder.com/150'}
-                                    alt={comp.firm_name}
-                                    className="h-20 w-auto object-contain z-10 drop-shadow-lg transform group-hover:scale-105 transition-transform duration-500"
-                                />
-                                <div className="absolute top-4 right-4 z-20">
-                                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${comp.status === 'active' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
-                                        comp.status === 'upcoming' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
-                                            'bg-gray-500/20 text-gray-400'
+                {/* Competition Grid */}
+                {!loading && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {filteredCompetitions.map((comp, idx) => (
+                            <div
+                                key={comp.id}
+                                className="group bg-[#0a0a0a] border border-[#1f1f1f] rounded-3xl overflow-hidden hover:border-brand-primary/50 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col h-full animate-fade-in-up"
+                                style={{ animationDelay: `${0.4 + idx * 0.1}s` }}
+                            >
+                                {/* Visual Banner */}
+                                <div className="h-56 bg-[#111] relative overflow-hidden p-8 flex items-center justify-center border-b border-[#1f1f1f]">
+                                    <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/10 to-transparent opacity-50"></div>
+                                    <div className="absolute inset-0 bg-grid-white opacity-[0.03]"></div>
+                                    
+                                    <img
+                                        src={comp.image_url || 'https://via.placeholder.com/150'}
+                                        alt={comp.firm_name}
+                                        className="h-24 w-auto object-contain z-10 drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] transform group-hover:scale-110 group-hover:rotate-2 transition-all duration-700"
+                                    />
+
+                                    {/* Status Indicator */}
+                                    <div className="absolute top-6 right-6 z-20">
+                                        <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border backdrop-blur-md ${
+                                            comp.status === 'active' 
+                                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]' 
+                                            : comp.status === 'upcoming' 
+                                            ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' 
+                                            : 'bg-neutral-500/10 text-neutral-400 border-neutral-500/20'
                                         }`}>
-                                        {comp.status}
-                                    </span>
+                                            <span className="flex items-center gap-1.5">
+                                                <span className={`w-1.5 h-1.5 rounded-full ${comp.status === 'active' ? 'bg-emerald-400 animate-pulse' : 'bg-current'}`}></span>
+                                                {comp.status}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Main Content */}
+                                <div className="p-8 flex-grow flex flex-col">
+                                    <div className="mb-8">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <span className="text-brand-primary text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-brand-primary/5 border border-brand-primary/10">
+                                                {comp.firm_name}
+                                            </span>
+                                            <span className="w-1 h-1 rounded-full bg-neutral-700"></span>
+                                            <span className="text-neutral-500 text-[10px] font-bold uppercase tracking-wider">Season 04</span>
+                                        </div>
+                                        <h3 className="text-2xl font-black text-white mb-3 group-hover:text-brand-primary transition-colors duration-300 leading-tight">
+                                            {comp.title}
+                                        </h3>
+                                        <p className="text-neutral-400 text-sm leading-relaxed line-clamp-2 font-medium">
+                                            {comp.description}
+                                        </p>
+                                    </div>
+
+                                    {/* Stats Dashboard */}
+                                    <div className="grid grid-cols-2 gap-px bg-[#1f1f1f] rounded-2xl overflow-hidden border border-[#1f1f1f] mb-8 shadow-inner">
+                                        <div className="bg-[#0d0d0d] p-4 flex flex-col gap-1">
+                                            <span className="text-neutral-500 text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5">
+                                                <Trophy size={10} className="text-brand-primary" /> Prize Pool
+                                            </span>
+                                            <span className="text-white text-lg font-black tracking-tight">{comp.prize_pool}</span>
+                                        </div>
+                                        <div className="bg-[#0d0d0d] p-4 flex flex-col gap-1">
+                                            <span className="text-neutral-500 text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5">
+                                                <Zap size={10} className="text-amber-500" /> Entry Fee
+                                            </span>
+                                            <span className="text-amber-500 text-lg font-black tracking-tight">{comp.entry_fee}</span>
+                                        </div>
+                                        <div className="bg-[#0d0d0d] p-4 flex flex-col gap-1">
+                                            <span className="text-neutral-500 text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5">
+                                                <Calendar size={10} /> Start Date
+                                            </span>
+                                            <span className="text-neutral-300 text-sm font-bold uppercase">{formatDate(comp.start_date)}</span>
+                                        </div>
+                                        <div className="bg-[#0d0d0d] p-4 flex flex-col gap-1">
+                                            <span className="text-neutral-500 text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5">
+                                                <Timer size={10} /> {comp.status === 'active' ? 'Ends In' : 'Starts In'}
+                                            </span>
+                                            <span className="text-white text-sm font-black uppercase">
+                                                {getDaysRemaining(comp.status === 'active' ? comp.end_date : comp.start_date)} Days
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Footer Action */}
+                                    <div className="mt-auto pt-2">
+                                        <Link to={`/competition/${comp.id}`} className="block w-full">
+                                            <button className="w-full h-14 rounded-2xl bg-white text-black font-black text-sm uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-brand-primary hover:text-white transition-all duration-300 group/btn shadow-xl active:scale-[0.98]">
+                                                View Arena <ArrowRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />
+                                            </button>
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
+                        ))}
+                    </div>
+                )}
 
-                            {/* Content */}
-                            <div className="p-6 flex-grow flex flex-col">
-                                <div className="mb-4">
-                                    <div className="text-brand-gold text-sm font-semibold mb-1">{comp.firm_name}</div>
-                                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-brand-gold transition-colors">{comp.title}</h3>
-                                    <p className="text-brand-muted text-sm line-clamp-2">{comp.description}</p>
-                                </div>
-
-                                {/* Stats Grid */}
-                                <div className="grid grid-cols-2 gap-4 mb-6 bg-black/20 p-4 rounded-xl border border-white/5">
-                                    <div>
-                                        <div className="text-brand-muted text-xs mb-1 flex items-center gap-1">
-                                            <Trophy size={12} /> Prize Pool
-                                        </div>
-                                        <div className="text-white font-bold">{comp.prize_pool}</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-brand-muted text-xs mb-1 flex items-center gap-1">
-                                            <DollarSign size={12} /> Entry Fee
-                                        </div>
-                                        <div className="text-brand-gold font-bold">{comp.entry_fee}</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-brand-muted text-xs mb-1 flex items-center gap-1">
-                                            <Calendar size={12} /> Start Date
-                                        </div>
-                                        <div className="text-white text-sm">{formatDate(comp.start_date)}</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-brand-muted text-xs mb-1 flex items-center gap-1">
-                                            <Timer size={12} /> Starts In
-                                        </div>
-                                        <div className="text-white text-sm font-mono">
-                                            {getDaysRemaining(comp.start_date)} Days
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Action */}
-                                <div className="mt-auto">
-                                    <Link
-                                        to={`/competition/${comp.id}`}
-                                        className="block w-full"
-                                    >
-                                        <Button className="w-full justify-center gap-2 bg-gradient-to-r from-brand-gold to-yellow-500 text-black border-none hover:shadow-lg hover:shadow-brand-gold/20">
-                                            View Details <ArrowRight size={16} />
-                                        </Button>
-                                    </Link>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
+                {/* Empty State */}
                 {filteredCompetitions.length === 0 && !loading && (
-                    <div className="text-center py-20 text-brand-muted">
-                        <Trophy size={48} className="mx-auto mb-4 opacity-20" />
-                        <p>No competitions found for this filter.</p>
+                    <div className="text-center py-32 flex flex-col items-center">
+                        <div className="w-20 h-20 rounded-full bg-[#0a0a0a] border border-[#1f1f1f] flex items-center justify-center text-neutral-700 mb-6">
+                            <Trophy size={40} />
+                        </div>
+                        <h3 className="text-white font-black text-xl mb-2">NO ACTIVE ARENAS</h3>
+                        <p className="text-neutral-500 font-medium">There are currently no competitions matching your selection.</p>
                     </div>
                 )}
             </div>
