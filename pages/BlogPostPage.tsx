@@ -194,7 +194,7 @@ const BlogPostPage: React.FC = () => {
         {/* CTA */}
         <div className="bg-gradient-to-r from-brand-gold/10 to-transparent border border-brand-gold/20 rounded-2xl p-8 mb-16 text-center">
           <h3 className="text-2xl font-black text-white mb-3">Find Your Perfect Prop Firm</h3>
-          <p className="text-brand-muted mb-6 max-w-md mx-auto">Compare firms, read verified reviews, and get exclusive discounts. Use code <strong className="text-brand-gold">SPOT</strong> to save!</p>
+          <p className="text-brand-muted mb-6 max-w-md mx-auto">Compare firms, read verified reviews, and get exclusive discounts. Use code <strong className="text-brand-gold">NOBLE</strong> to save!</p>
           <div className="flex flex-wrap gap-3 justify-center">
             <Link to="/firms">
               <button className="bg-brand-gold text-black font-black px-6 py-3 rounded-xl hover:bg-white transition-colors shadow-lg">

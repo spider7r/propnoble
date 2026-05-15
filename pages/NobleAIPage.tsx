@@ -70,7 +70,7 @@ const QUESTIONS = [
     }
 ];
 
-const SpotAIPage: React.FC = () => {
+const NobleAIPage: React.FC = () => {
     const [step, setStep] = useState(-1); // -1 = welcome screen
     const [answers, setAnswers] = useState<Partial<QuizPreferences>>({});
     const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -367,4 +367,4 @@ const SpotAIPage: React.FC = () => {
     );
 };
 
-export default SpotAIPage;
+export default NobleAIPage;

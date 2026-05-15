@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient';
 import { Trophy, Calendar, DollarSign, ArrowRight, Timer, Zap } from 'lucide-react';
 import Button from '../components/Button';
 import { Link } from 'react-router-dom';
+import { useTradeMode } from '../context/TradeModeContext';
 
 interface Competition {
     id: string;
@@ -19,24 +20,38 @@ interface Competition {
 }
 
 const CompetitionsPage = () => {
+    const { mode, getModePath } = useTradeMode();
     const [competitions, setCompetitions] = useState<Competition[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<'all' | 'active' | 'upcoming'>('all');
+    const isFutures = mode === 'futures';
 
     useEffect(() => {
         fetchCompetitions();
-    }, []);
+    }, [mode]);
 
     const fetchCompetitions = async () => {
         try {
             setLoading(true);
+            // We'll join with firms to filter by trading_type
             const { data, error } = await supabase
                 .from('competitions')
-                .select('*')
+                .select('*, firms(trading_type, tags)')
                 .order('start_date', { ascending: true });
 
             if (error) throw error;
-            setCompetitions(data || []);
+            
+            // Filter by mode
+            const filtered = (data || []).filter(comp => {
+                const firm = (comp.firms as any);
+                if (isFutures) {
+                    return firm?.trading_type === 'futures' || firm?.tags?.some((t: string) => t.toLowerCase() === 'futures');
+                } else {
+                    return firm?.trading_type !== 'futures' && !firm?.tags?.some((t: string) => t.toLowerCase() === 'futures');
+                }
+            });
+
+            setCompetitions(filtered);
         } catch (error) {
             console.error('Error fetching competitions:', error);
         } finally {
@@ -64,19 +79,19 @@ const CompetitionsPage = () => {
         <div className="min-h-screen bg-black pt-36 pb-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
             {/* Premium Background Effects */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-brand-primary/10 rounded-full blur-[150px] animate-aurora"></div>
-                <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-brand-primary/5 rounded-full blur-[150px] animate-aurora-reverse"></div>
+                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-brand-accent/10 rounded-full blur-[150px] animate-aurora"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-brand-accent/5 rounded-full blur-[150px] animate-aurora-reverse"></div>
                 <div className="absolute inset-0 bg-grid-white opacity-[0.02]"></div>
             </div>
 
             <div className="max-w-7xl mx-auto relative z-10">
                 {/* Hero Header */}
                 <div className="text-center mb-20">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-primary/10 border border-brand-primary/20 text-brand-primary text-xs font-bold uppercase tracking-widest mb-6 animate-fade-in-up">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-accent/10 border border-brand-accent/20 text-brand-accent text-xs font-bold uppercase tracking-widest mb-6 animate-fade-in-up">
                         <Trophy size={14} /> Elite Trading Events
                     </div>
                     <h1 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tight uppercase animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                        Trading <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary via-red-500 to-amber-500">Competitions</span>
+                        {isFutures ? 'Futures' : 'Trading'} <span className="text-brand-accent">Competitions</span>
                     </h1>
                     <p className="text-brand-muted text-lg md:text-xl max-w-3xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
                         Join the arena where the world's best traders compete for glory and massive capital. 
@@ -92,7 +107,7 @@ const CompetitionsPage = () => {
                                 key={f}
                                 onClick={() => setFilter(f)}
                                 className={`px-8 py-3 rounded-xl text-sm font-black transition-all duration-500 uppercase tracking-wider ${filter === f
-                                    ? 'bg-brand-primary text-white shadow-[0_0_20px_rgba(255,0,0,0.3)]'
+                                    ? 'bg-brand-accent text-black shadow-brand-glow'
                                     : 'text-neutral-500 hover:text-white hover:bg-white/5'
                                     }`}
                             >
@@ -106,8 +121,8 @@ const CompetitionsPage = () => {
                 {loading && (
                     <div className="flex flex-col items-center justify-center py-32">
                         <div className="relative w-16 h-16">
-                            <div className="absolute inset-0 rounded-full border-t-2 border-brand-primary animate-spin"></div>
-                            <div className="absolute inset-2 rounded-full border-b-2 border-brand-primary opacity-50 animate-spin-slow"></div>
+                            <div className="absolute inset-0 rounded-full border-t-2 border-brand-accent animate-spin"></div>
+                            <div className="absolute inset-2 rounded-full border-b-2 border-brand-accent opacity-50 animate-spin-slow"></div>
                         </div>
                         <p className="mt-6 text-brand-muted font-bold tracking-widest uppercase text-xs animate-pulse">Synchronizing Data...</p>
                     </div>
@@ -119,12 +134,12 @@ const CompetitionsPage = () => {
                         {filteredCompetitions.map((comp, idx) => (
                             <div
                                 key={comp.id}
-                                className="group bg-[#0a0a0a] border border-[#1f1f1f] rounded-3xl overflow-hidden hover:border-brand-primary/50 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col h-full animate-fade-in-up"
+                                className="group bg-[#0a0a0a] border border-[#1f1f1f] rounded-3xl overflow-hidden hover:border-brand-accent/50 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col h-full animate-fade-in-up"
                                 style={{ animationDelay: `${0.4 + idx * 0.1}s` }}
                             >
                                 {/* Visual Banner */}
                                 <div className="h-56 bg-[#111] relative overflow-hidden p-8 flex items-center justify-center border-b border-[#1f1f1f]">
-                                    <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/10 to-transparent opacity-50"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-br from-brand-accent/10 to-transparent opacity-50"></div>
                                     <div className="absolute inset-0 bg-grid-white opacity-[0.03]"></div>
                                     
                                     <img
@@ -154,13 +169,13 @@ const CompetitionsPage = () => {
                                 <div className="p-8 flex-grow flex flex-col">
                                     <div className="mb-8">
                                         <div className="flex items-center gap-2 mb-3">
-                                            <span className="text-brand-primary text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-brand-primary/5 border border-brand-primary/10">
+                                            <span className="text-brand-accent text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-brand-accent/5 border border-brand-accent/10">
                                                 {comp.firm_name}
                                             </span>
                                             <span className="w-1 h-1 rounded-full bg-neutral-700"></span>
                                             <span className="text-neutral-500 text-[10px] font-bold uppercase tracking-wider">Season 04</span>
                                         </div>
-                                        <h3 className="text-2xl font-black text-white mb-3 group-hover:text-brand-primary transition-colors duration-300 leading-tight">
+                                        <h3 className="text-2xl font-black text-white mb-3 group-hover:text-brand-accent transition-colors duration-300 leading-tight">
                                             {comp.title}
                                         </h3>
                                         <p className="text-neutral-400 text-sm leading-relaxed line-clamp-2 font-medium">
@@ -172,7 +187,7 @@ const CompetitionsPage = () => {
                                     <div className="grid grid-cols-2 gap-px bg-[#1f1f1f] rounded-2xl overflow-hidden border border-[#1f1f1f] mb-8 shadow-inner">
                                         <div className="bg-[#0d0d0d] p-4 flex flex-col gap-1">
                                             <span className="text-neutral-500 text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5">
-                                                <Trophy size={10} className="text-brand-primary" /> Prize Pool
+                                                <Trophy size={10} className="text-brand-accent" /> Prize Pool
                                             </span>
                                             <span className="text-white text-lg font-black tracking-tight">{comp.prize_pool}</span>
                                         </div>
@@ -200,8 +215,8 @@ const CompetitionsPage = () => {
 
                                     {/* Footer Action */}
                                     <div className="mt-auto pt-2">
-                                        <Link to={`/competition/${comp.id}`} className="block w-full">
-                                            <button className="w-full h-14 rounded-2xl bg-white text-black font-black text-sm uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-brand-primary hover:text-white transition-all duration-300 group/btn shadow-xl active:scale-[0.98]">
+                                        <Link to={getModePath(`/competition/${comp.id}`)} className="block w-full">
+                                            <button className="w-full h-14 rounded-2xl bg-white text-black font-black text-sm uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-brand-accent hover:text-white transition-all duration-300 group/btn shadow-xl active:scale-[0.98]">
                                                 View Arena <ArrowRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />
                                             </button>
                                         </Link>

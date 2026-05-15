@@ -1,0 +1,62 @@
+:root {
+  /* Default: Forex Theme (Red) */
+  --brand-accent: #ff3300;
+  --brand-accent-rgb: 255, 51, 0;
+  --brand-accent-hover: #e62e00;
+  --brand-glow: rgba(255, 51, 0, 0.3);
+  --brand-glow-strong: rgba(255, 51, 0, 0.5);
+  --brand-gradient: linear-gradient(135deg, #ff3300 0%, #ff6b00 100%);
+}
+
+[data-theme='futures'] {
+  /* Futures Theme (Cyan/Electric Blue) */
+  --brand-accent: #00f2ff;
+  --brand-accent-rgb: 0, 242, 255;
+  --brand-accent-hover: #00d4df;
+  --brand-glow: rgba(0, 242, 255, 0.3);
+  --brand-glow-strong: rgba(0, 242, 255, 0.5);
+  --brand-gradient: linear-gradient(135deg, #00f2ff 0%, #00a3ff 100%);
+}
+
+.text-brand-accent { color: var(--brand-accent); }
+.bg-brand-accent { background-color: var(--brand-accent); }
+.border-brand-accent { border-color: var(--brand-accent); }
+
+.bg-brand-gradient {
+  background: var(--brand-gradient);
+}
+
+.text-brand-gradient {
+  background: var(--brand-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.shadow-brand-glow {
+  box-shadow: 0 0 20px -5px var(--brand-glow);
+}
+
+.shadow-brand-neon {
+  box-shadow: 0 0 30px -2px var(--brand-glow-strong);
+}
+
+.bg-brand-accent\/10 { background-color: rgba(var(--brand-accent-rgb), 0.1); }
+.bg-brand-accent\/20 { background-color: rgba(var(--brand-accent-rgb), 0.2); }
+.border-brand-accent\/20 { border-color: rgba(var(--brand-accent-rgb), 0.2); }
+.border-brand-accent\/30 { border-color: rgba(var(--brand-accent-rgb), 0.3); }
+.ring-brand-accent\/20 { --tw-ring-color: rgba(var(--brand-accent-rgb), 0.2); }
+
+@keyframes shimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

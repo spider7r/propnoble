@@ -1,21 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { TrendingUp, Shield, Award, ChevronRight, ChevronLeft, Users, Zap, CheckCircle2, ArrowRight, LineChart, Bookmark, Star, Cpu, Terminal, ChevronDown, HelpCircle, Sparkles, ShieldCheck, BarChart3, GraduationCap, X, Globe, Flame, Trophy, Gift, Copy } from 'lucide-react';
 import { formatFunding } from '../lib/format';
 import FirmCard from '../components/FirmCard';
 import { supabase } from '../lib/supabaseClient';
 import { PropFirm } from '../types';
+import { useTradeMode } from '../context/TradeModeContext';
+import { mapFirmFromDB, FirmService } from '../lib/services';
 
 // FAQ Accordion Item Component
 const FaqItem: React.FC<{ question: string; answer: string }> = ({ question, answer }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className={`relative rounded-2xl overflow-hidden transition-all duration-300 ${isOpen ? 'ring-1 ring-brand-primary/20' : ''}`}>
-      <div className={`absolute inset-0 rounded-2xl bg-gradient-to-b ${isOpen ? 'from-brand-primary/10 via-brand-primary/5 to-transparent' : 'from-white/[0.04] via-white/[0.02] to-white/[0.01]'} transition-all duration-300`}></div>
+    <div className={`relative rounded-2xl overflow-hidden transition-all duration-300 ${isOpen ? 'ring-1 ring-brand-accent/20' : ''}`}>
+      <div className={`absolute inset-0 rounded-2xl bg-gradient-to-b ${isOpen ? 'from-brand-accent/10 via-brand-accent/5 to-transparent' : 'from-white/[0.04] via-white/[0.02] to-white/[0.01]'} transition-all duration-300`}></div>
       <div className="absolute inset-[1px] rounded-2xl bg-[#0c0b09]"></div>
       <button onClick={() => setIsOpen(!isOpen)} className="relative z-[2] w-full flex items-center justify-between p-6 text-left">
-        <span className={`font-bold ${isOpen ? 'text-brand-primary' : 'text-white'} transition-colors pr-4`}>{question}</span>
-        <ChevronDown size={18} className={`text-neutral-500 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-brand-primary' : ''}`} />
+        <span className={`font-bold ${isOpen ? 'text-brand-accent' : 'text-white'} transition-colors pr-4`}>{question}</span>
+        <ChevronDown size={18} className={`text-neutral-500 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-brand-accent' : ''}`} />
       </button>
       <div className={`relative z-[2] overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[300px] opacity-100' : 'max-h-0 opacity-0'}`}>
         <p className="px-6 pb-6 text-neutral-400 text-sm leading-relaxed">{answer}</p>
@@ -25,11 +27,13 @@ const FaqItem: React.FC<{ question: string; answer: string }> = ({ question, ans
 };
 
 const LandingPage: React.FC = () => {
+  const { mode, getModePath } = useTradeMode();
   const [topFirms, setTopFirms] = useState<PropFirm[]>([]);
   const [activeFirm, setActiveFirm] = useState(0);
   const [offersPage, setOffersPage] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [copiedFirm, setCopiedFirm] = useState<{name: string; logo: string; rating: number; code: string; discount: string; website: string; affiliate: string} | null>(null);
+  const isFutures = mode === 'futures';
 
   // Detect mobile for pagination page size
   useEffect(() => {
@@ -90,7 +94,7 @@ const LandingPage: React.FC = () => {
     { name: 'Goat Funded Trader', logo: 'https://cdn.prod.website-files.com/67b3682cc0f1f956e16efe80/67b3682cc0f1f956e16efe99_Logo%20(76).avif' },
     { name: 'ATS Funded', logo: 'https://atsfunded.com/ats-logo.png' },
     { name: 'Blueberry Funded', logo: 'https://blueberryfunded.com/wp-content/themes/blueberryfunded-xmas/assets/img/logo.svg' },
-    { name: 'Funding Pips', logo: 'https://media.propfirmmatch.com/system/b5filxasbwwrg110uhxvgv4v/675854fe6df8f98dc09b6caf_FundingPips-Logotype.svg' },
+    { name: 'Funding Pips', logo: 'https://media.propNoble.com/system/b5filxasbwwrg110uhxvgv4v/675854fe6df8f98dc09b6caf_FundingPips-Logotype.svg' },
     { name: 'Alpha Capital', logo: 'https://alphacapitalgroup.uk/static/media/companyLogoInitials.879d8bbc8b528b1fd27761f4e43c34a0.svg' },
     { name: 'The5ers', logo: 'https://the5ers.com/images/menu/logo.svg' },
     { name: 'Funded Firm', logo: 'https://www.fundedfirm.com/_next/static/media/log.fa3e1c39.svg' },
@@ -98,88 +102,52 @@ const LandingPage: React.FC = () => {
     { name: 'E8 Markets', logo: 'https://e8markets.com/images/logo/logo.svg' },
   ];
 
-  // Duplicate logos for seamless infinite scroll
-  const tickerFirms = [...TICKER_LOGOS, ...TICKER_LOGOS, ...TICKER_LOGOS];
+  // Duplicate logos for seamless infinite scroll and filter by mode
+  const tickerFirms = useMemo(() => {
+    const filtered = TICKER_LOGOS.filter(firm => {
+      const name = firm.name.toLowerCase();
+      const isFutures = name.includes('ats') || name.includes('futures');
+      return mode === 'futures' ? isFutures : !isFutures;
+    });
+    return [...filtered, ...filtered, ...filtered];
+  }, [mode]);
 
   useEffect(() => {
     fetchTopFirms();
-  }, []);
+  }, [mode]);
 
   useEffect(() => {
     const len = showcaseFirms.length;
+    if (len === 0) return;
     const interval = setInterval(() => {
       setActiveFirm((prev) => (prev + 1) % len);
     }, 3000);
     return () => clearInterval(interval);
-  }, [topFirms.length]);
+  }, [topFirms.length, mode]);
 
   const fetchTopFirms = async () => {
     try {
-      const { data, error } = await supabase
-        .from('firms')
-        .select('*')
-        .order('show_in_hero', { ascending: false, nullsFirst: false })
-        .order('rating', { ascending: false })
-        .limit(12);
+      // Use the centralized service for consistent filtering logic
+      const firms = await FirmService.getActiveFirms(mode);
+      
+      const getFaviconUrl = (websiteUrl: string | null | undefined, fallbackLogo: string | null) => {
+        if (!websiteUrl) return fallbackLogo || 'https://placehold.co/400x400/181611/F6AE13?text=No+Logo';
+        try {
+          const hostname = new URL(websiteUrl).hostname;
+          return `https://www.google.com/s2/favicons?domain=${hostname}&sz=128`;
+        } catch {
+          return fallbackLogo || 'https://placehold.co/400x400/181611/F6AE13?text=No+Logo';
+        }
+      };
 
-      if (error) throw error;
+      const mappedFirms = firms.map(f => ({
+        ...f,
+        favicon: getFaviconUrl(f.websiteUrl || f.website, f.logo)
+      }));
 
-      if (data) {
-        // Helper function to safely get favicon URL
-        const getFaviconUrl = (websiteUrl: string | null | undefined, fallbackLogo: string | null) => {
-          if (!websiteUrl) return fallbackLogo || 'https://placehold.co/400x400/181611/F6AE13?text=No+Logo';
-          try {
-            const hostname = new URL(websiteUrl).hostname;
-            return `https://www.google.com/s2/favicons?domain=${hostname}&sz=128`;
-          } catch {
-            return fallbackLogo || 'https://placehold.co/400x400/181611/F6AE13?text=No+Logo';
-          }
-        };
-
-        // Map DB fields to PropFirm type if necessary, or assume direct match
-        // Ensure numbers are numbers, etc.
-        const mappedFirms: PropFirm[] = data.map(f => ({
-          ...f,
-          rating: Number(f.rating) || 0,
-          maxFunding: Number(f.max_funding) || 0,
-          trustScore: Number(f.trust_score) || 95, // Default to 95 if column missing
-          reviewCount: Number(f.review_count) || 0,
-          profitSplit: f.profit_split || '',
-          drawdown: f.drawdown || '',
-          tags: f.tags || [],
-          // Use Google Favicon Service for consistent high-quality logos
-          logo: getFaviconUrl(f.website_url || f.website, f.logo_url),
-          name: f.name,
-          id: f.id,
-          description: f.description || '',
-          websiteUrl: f.website_url || f.website,
-          affiliateLink: f.affiliate_link,
-          promoCode: f.promo_code,
-          discountValue: f.discount_value,
-          platforms: f.platforms || [],
-          paymentMethods: f.payment_methods || [],
-          foundedYear: f.founded_year || new Date().getFullYear(),
-          minDays: f.min_days || 0,
-          maxDays: f.max_days || 0,
-          dailyDrawdown: f.daily_drawdown || '',
-          profitTarget: f.profit_target || '',
-          leverage: f.leverage || '',
-          commission: f.commission || '',
-          newsTrading: f.news_trading || false,
-          weekendHolding: f.weekend_holding || false,
-          expertAdvisors: f.expert_advisors || false,
-          refundPolicy: f.refund_policy || '',
-          payoutFrequency: f.payout_frequency || '',
-          trustPilotScore: f.trust_pilot_score ? Number(f.trust_pilot_score) : 0,
-          twitterFollowers: f.twitter_followers ? Number(f.twitter_followers) : 0,
-          discordMembers: f.discord_members ? Number(f.discord_members) : 0,
-          supportEmail: f.support_email || '',
-          challenges: [] // Not needed for card display
-        }));
-
-        setTopFirms(mappedFirms);
-        // Ticker now uses static TICKER_LOGOS defined at component level
-      }
+      // Sort by rating and respect show_in_hero if possible
+      // (The service returns all active firms for the mode, so we just take the top ones)
+      setTopFirms(mappedFirms.slice(0, 12));
     } catch (err) {
       console.error("Error fetching top firms for landing:", err);
     }
@@ -204,25 +172,25 @@ const LandingPage: React.FC = () => {
           </video>
           
           {/* Brand Color Tint Overlay */}
-          <div className="absolute inset-0 bg-brand-primary/20 mix-blend-color" />
+          <div className="absolute inset-0 bg-brand-accent/20 mix-blend-color" />
           
           {/* Gradient Fades for seamless blending */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-black" />
           
-          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-primary/20 to-transparent"></div>
-          <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-brand-primary/15 rounded-[100%] blur-[120px] mix-blend-screen pointer-events-none" />
+          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-accent/20 to-transparent"></div>
+          <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-brand-accent/15 rounded-[100%] blur-[120px] mix-blend-screen pointer-events-none" />
           <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 contrast-150 mix-blend-overlay" />
         </div>
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 w-full text-center mt-6 lg:mt-10">
           {/* Top Pill Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-primary/10 border border-brand-primary/20 mb-6 animate-fade-in-up">
-            <span className="text-xs font-bold text-brand-primary uppercase tracking-wider">🏆 #1 Prop Firm Comparator</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-accent/10 border border-brand-accent/20 mb-6 animate-fade-in-up">
+            <span className="text-xs font-bold text-brand-accent uppercase tracking-wider">🏆 #1 {isFutures ? 'Futures' : 'Forex'} Firm Comparator</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[64px] font-black tracking-tighter mb-6 leading-[1.2] animate-fade-in-up w-full">
-            <span className="text-white block pb-2">Find & Compare Top Prop Firms</span>
-            <span className="block py-2 bg-gradient-to-r from-brand-primary via-[#ff4444] to-brand-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-[shimmer_3s_linear_infinite]" style={{ filter: 'drop-shadow(0 4px 20px rgba(255,0,0,0.4))' }}>Trade Smarter Earn Bigger</span>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[64px] font-black tracking-tighter mb-6 leading-[1.1] animate-fade-in-up w-full">
+            <span className="text-white block pb-2">Find & Compare Top {isFutures ? 'Futures' : 'Forex'} Firms</span>
+            <span className="block py-1 bg-brand-gradient bg-[length:200%_auto] bg-clip-text text-transparent animate-[shimmer_3s_linear_infinite]" style={{ filter: `drop-shadow(0 4px 20px var(--brand-glow))` }}>Trade Smarter Earn Bigger</span>
           </h1>
 
           <p className="max-w-2xl lg:max-w-3xl mx-auto text-base sm:text-lg md:text-xl text-neutral-400 mb-12 leading-relaxed font-medium animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
@@ -244,13 +212,13 @@ const LandingPage: React.FC = () => {
             {/* Desktop View (hidden on mobile) */}
             <div className="hidden md:flex flex-wrap justify-center gap-4 px-2">
               {[
-                { icon: Shield, text: '50+ Verified Top Prop Firms' },
+                { icon: Shield, text: `50+ Verified Top ${isFutures ? 'Futures' : 'Forex'} Firms` },
                 { icon: BarChart3, text: '1000+ Challenges' },
                 { icon: Users, text: '9000+ Real Trader Reviews' },
                 { icon: Globe, text: '4M+ Monthly Website Views' }
               ].map((stat, i) => (
-                <div key={i} className="flex items-center gap-2 bg-white/5 border border-white/5 rounded-full px-4 py-2 hover:bg-white/10 hover:border-brand-primary/30 transition-colors">
-                  <stat.icon size={16} className="text-brand-primary shrink-0" />
+                <div key={i} className="flex items-center gap-2 bg-white/5 border border-white/5 rounded-full px-4 py-2 hover:bg-white/10 hover:border-brand-accent/30 transition-colors">
+                  <stat.icon size={16} className="text-brand-accent shrink-0" />
                   <span className="text-xs sm:text-sm font-semibold text-neutral-300 whitespace-nowrap">{stat.text}</span>
                 </div>
               ))}
@@ -262,13 +230,13 @@ const LandingPage: React.FC = () => {
                 {/* First set of badges */}
                 <div className="flex gap-3 px-3">
                   {[
-                    { icon: Shield, text: '50+ Verified Top Prop Firms' },
+                    { icon: Shield, text: `50+ Verified Top ${isFutures ? 'Futures' : 'Forex'} Firms` },
                     { icon: BarChart3, text: '1000+ Challenges' },
                     { icon: Users, text: '9000+ Real Trader Reviews' },
                     { icon: Globe, text: '4M+ Monthly Website Views' }
                   ].map((stat, i) => (
                     <div key={`m1-${i}`} className="flex items-center gap-2 bg-[#181611]/80 border border-white/5 rounded-full px-3 py-1.5 shrink-0">
-                      <stat.icon size={14} className="text-brand-primary shrink-0" />
+                      <stat.icon size={14} className="text-brand-accent shrink-0" />
                       <span className="text-[11px] font-semibold text-neutral-300 whitespace-nowrap">{stat.text}</span>
                     </div>
                   ))}
@@ -276,13 +244,13 @@ const LandingPage: React.FC = () => {
                 {/* Second set of badges (for seamless loop) */}
                 <div className="flex gap-3 px-3" aria-hidden="true">
                   {[
-                    { icon: Shield, text: '50+ Verified Top Prop Firms' },
+                    { icon: Shield, text: `50+ Verified Top ${isFutures ? 'Futures' : 'Forex'} Firms` },
                     { icon: BarChart3, text: '1000+ Challenges' },
                     { icon: Users, text: '9000+ Real Trader Reviews' },
                     { icon: Globe, text: '4M+ Monthly Website Views' }
                   ].map((stat, i) => (
                     <div key={`m2-${i}`} className="flex items-center gap-2 bg-[#181611]/80 border border-white/5 rounded-full px-3 py-1.5 shrink-0">
-                      <stat.icon size={14} className="text-brand-primary shrink-0" />
+                      <stat.icon size={14} className="text-brand-accent shrink-0" />
                       <span className="text-[11px] font-semibold text-neutral-300 whitespace-nowrap">{stat.text}</span>
                     </div>
                   ))}
@@ -299,12 +267,12 @@ const LandingPage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 animate-fade-in-up relative mx-auto w-full max-w-[1300px]" style={{ animationDelay: '0.2s' }}>
 
             {/* Exclusive Offers Card (colspan 8) */}
-            <div className="lg:col-span-8 bg-[#110f0a] border border-brand-primary/15 rounded-2xl p-3 sm:p-4 pb-3 relative overflow-hidden group shadow-xl flex flex-col">
-               <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/5 to-transparent pointer-events-none"></div>
+            <div className="lg:col-span-8 bg-[#110f0a] border border-brand-accent/15 rounded-2xl p-3 sm:p-4 pb-3 relative overflow-hidden group shadow-xl flex flex-col">
+               <div className="absolute inset-0 bg-gradient-to-br from-brand-accent/5 to-transparent pointer-events-none"></div>
                
                <div className="flex items-center justify-between mb-4 relative z-10">
                  <h3 className="text-white font-bold text-base sm:text-lg flex items-center gap-2">
-                   Exclusive Offers <Flame size={16} className="text-[#f93a74] drop-shadow-[0_0_8px_rgba(249,58,116,0.6)]" />
+                   Exclusive Offers <Flame size={16} className="text-brand-accent drop-shadow-brand-glow" />
                  </h3>
                  <div className="flex items-center gap-2 shrink-0">
                    {totalOffersPages > 1 && (
@@ -339,7 +307,7 @@ const LandingPage: React.FC = () => {
 
                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 sm:grid-rows-[repeat(2,1fr)] gap-2.5 relative z-10 flex-1">
                  {paginatedOffers.map((firm, i) => (
-                   <div key={firm.id || i} className="bg-[#0a0908] border border-white/5 rounded-xl p-3 pr-3 flex items-center justify-between hover:border-brand-primary/30 hover:bg-[#0f0d0a] transition-all duration-300">
+                   <div key={firm.id || i} className="bg-[#0a0908] border border-white/5 rounded-xl p-3 pr-3 flex items-center justify-between hover:border-brand-accent/30 hover:bg-[#0f0d0a] transition-all duration-300">
                      <div className="flex items-center gap-2.5 min-w-0">
                        <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0">
                           <img src={firm.logo} alt={firm.name} className="w-full h-full object-cover" />
@@ -347,9 +315,9 @@ const LandingPage: React.FC = () => {
                        <div className="text-left min-w-0">
                          <h4 className="text-white text-sm font-bold tracking-tight mb-0.5 truncate">{firm.name}</h4>
                          <div className="flex items-center gap-1">
-                           <span className="text-brand-primary text-[11px] font-bold leading-none">{Number(firm.rating).toFixed(1)}</span>
+                           <span className="text-brand-accent text-[11px] font-bold leading-none">{Number(firm.rating).toFixed(1)}</span>
                            <div className="flex gap-[1px]">
-                             {[1,2,3,4,5].map(s=><Star key={s} size={8} className={s <= Math.round(Number(firm.rating)) ? "text-brand-primary fill-brand-primary" : "text-neutral-700 fill-neutral-700"}/>)}
+                             {[1,2,3,4,5].map(s=><Star key={s} size={8} className={s <= Math.round(Number(firm.rating)) ? "text-brand-accent fill-brand-accent" : "text-neutral-700 fill-neutral-700"}/>)}
                            </div>
                          </div>
                        </div>
@@ -357,11 +325,11 @@ const LandingPage: React.FC = () => {
                      <div className="flex flex-col gap-1.5 shrink-0 pl-2">
                         <div className="border border-white/10 text-white/90 text-[9px] font-bold px-2.5 py-1 rounded-full flex items-center justify-between gap-1.5 bg-white/5 w-[80px] whitespace-nowrap">
                           <span>{firm.discountValue ? `${firm.discountValue}% OFF` : 'DEAL'}</span>
-                          <Gift size={9} className="text-brand-primary shrink-0"/>
+                          <Gift size={9} className="text-brand-accent shrink-0"/>
                         </div>
                         <button
                           onClick={() => handleCopyCode(firm)}
-                          className="bg-gradient-to-r from-brand-primary to-yellow-400 text-black text-[9px] font-black px-2.5 py-1 rounded-full flex items-center justify-between gap-1.5 shadow-[0_2px_10px_-2px_rgba(255,0,0,0.4)] w-[80px] whitespace-nowrap hover:shadow-[0_4px_20px_-2px_rgba(246,174,19,0.6)] hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer"
+                          className="bg-brand-gradient text-black text-[9px] font-black px-2.5 py-1 rounded-full flex items-center justify-between gap-1.5 shadow-brand-glow w-[80px] whitespace-nowrap hover:shadow-brand-neon hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer"
                         >
                           <span className="tracking-wide">{firm.promoCode || 'NOBLE'}</span>
                           <Copy size={9} className="stroke-[2.5] shrink-0"/>
@@ -373,17 +341,17 @@ const LandingPage: React.FC = () => {
             </div>
 
             {/* Popular Prop Firms (colspan 4) */}
-            <div className="lg:col-span-4 bg-[#110f0a] border border-brand-primary/15 rounded-2xl p-3 sm:p-4 flex flex-col shadow-xl relative overflow-hidden group">
-               <div className="absolute inset-0 bg-gradient-to-bl from-brand-primary/5 to-transparent pointer-events-none"></div>
+            <div className="lg:col-span-4 bg-[#110f0a] border border-brand-accent/15 rounded-2xl p-3 sm:p-4 flex flex-col shadow-xl relative overflow-hidden group">
+               <div className="absolute inset-0 bg-gradient-to-bl from-brand-accent/5 to-transparent pointer-events-none"></div>
                <div className="flex items-center justify-center mb-4 relative z-10">
                  <h3 className="text-white font-bold text-base sm:text-lg flex items-center gap-2">
-                   Top Rated Firms <Trophy size={16} className="text-[#f65c13] drop-shadow-[0_0_8px_rgba(246,92,19,0.6)]" />
+                   Top Rated Firms <Trophy size={16} className="text-brand-accent drop-shadow-brand-glow" />
                  </h3>
                </div>
                
                <div className="flex-1 flex flex-col gap-2.5 relative z-10">
                  {showcaseFirms.map((firm, i) => (
-                   <div key={firm.id || i} className="bg-[#0a0908] border border-white/5 rounded-xl p-2 pr-2.5 flex items-center justify-between hover:border-brand-primary/30 hover:bg-[#0f0d0a] transition-all duration-300 w-full">
+                   <div key={firm.id || i} className="bg-[#0a0908] border border-white/5 rounded-xl p-2 pr-2.5 flex items-center justify-between hover:border-brand-accent/30 hover:bg-[#0f0d0a] transition-all duration-300 w-full">
                      <div className="flex items-center gap-2 min-w-0">
                        <div className="w-7 flex items-center justify-center shrink-0">
                          {i === 0 ? <Trophy size={16} className="text-[#fbbf24] drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" /> :
@@ -397,9 +365,9 @@ const LandingPage: React.FC = () => {
                        <div className="text-left min-w-0">
                          <h4 className="text-white text-xs font-bold tracking-tight mb-0.5 truncate">{firm.name}</h4>
                          <div className="flex items-center gap-1">
-                           <span className="text-brand-primary text-[10px] font-bold leading-none">{firm.rating.toFixed(1)}</span>
+                           <span className="text-brand-accent text-[10px] font-bold leading-none">{firm.rating.toFixed(1)}</span>
                            <div className="flex gap-[1px]">
-                             {[1,2,3,4,5].map(s=><Star key={s} size={7} className={s <= Math.floor(firm.rating) ? "text-brand-primary fill-brand-primary" : "text-neutral-700 fill-neutral-700"}/>)}
+                             {[1,2,3,4,5].map(s=><Star key={s} size={7} className={s <= Math.floor(firm.rating) ? "text-brand-accent fill-brand-accent" : "text-neutral-700 fill-neutral-700"}/>)}
                            </div>
                          </div>
                        </div>
@@ -407,16 +375,16 @@ const LandingPage: React.FC = () => {
                      <div className="flex flex-col gap-1 shrink-0 pl-1">
                         <div className="border border-white/10 text-white/90 text-[9px] font-bold px-2 py-[3px] rounded-full flex items-center justify-between gap-1 bg-white/5 w-[76px] whitespace-nowrap">
                           <span>DEAL</span>
-                          <Gift size={8} className="text-brand-primary shrink-0"/>
+                          <Gift size={8} className="text-brand-accent shrink-0"/>
                         </div>
                         <button
                           onClick={() => {
                             const matchedFirm = topFirms.find(f => f.name === firm.name);
                             if (matchedFirm) handleCopyCode(matchedFirm);
                           }}
-                          className="bg-gradient-to-r from-brand-primary to-yellow-400 text-black text-[9px] font-black px-2 py-[3px] rounded-full flex items-center justify-between gap-1 shadow-[0_2px_10px_-2px_rgba(255,0,0,0.4)] w-[76px] whitespace-nowrap hover:shadow-[0_4px_20px_-2px_rgba(246,174,19,0.6)] hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer"
+                          className="bg-brand-gradient text-black text-[9px] font-black px-2 py-[3px] rounded-full flex items-center justify-between gap-1 shadow-brand-glow w-[76px] whitespace-nowrap hover:shadow-brand-neon hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer"
                         >
-                          <span className="tracking-wide">SPOT</span>
+                          <span className="tracking-wide">NOBLE</span>
                           <Copy size={8} className="stroke-[2.5] shrink-0"/>
                         </button>
                      </div>
@@ -428,9 +396,9 @@ const LandingPage: React.FC = () => {
           </div>
           
           <div className="w-full max-w-[1300px] mx-auto flex justify-end mt-3 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-             <Link to="/firms">
+             <Link to={getModePath('/firms')}>
                 <button className="text-neutral-400 hover:text-white flex items-center gap-2 text-sm font-semibold transition-colors border border-white/5 bg-white/5 rounded-full px-5 py-2 hover:bg-white/10 hover:border-white/10 shadow-lg">
-                   View All Firms <ArrowRight size={14} />
+                   View All {isFutures ? 'Futures' : ''} Firms <ArrowRight size={14} />
                 </button>
              </Link>
           </div>
@@ -441,7 +409,7 @@ const LandingPage: React.FC = () => {
           <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" onClick={() => setCopiedFirm(null)}>
             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
             <div
-              className="relative bg-[#111] border border-brand-primary/30 rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-[0_20px_80px_-10px_rgba(246,174,19,0.35)] animate-fade-in-up"
+              className="relative bg-[#111] border border-brand-accent/30 rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-brand-glow animate-fade-in-up"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close button */}
@@ -461,8 +429,8 @@ const LandingPage: React.FC = () => {
               <p className="text-neutral-400 text-sm text-center mb-5">Use this code at checkout for your discount</p>
 
               {/* Code Display */}
-              <div className="bg-brand-primary/10 border border-brand-primary/30 rounded-2xl px-5 py-3 flex items-center justify-center gap-3 mb-5">
-                <span className="text-brand-primary text-2xl font-black tracking-widest">{copiedFirm.code}</span>
+              <div className="bg-brand-accent/10 border border-brand-accent/30 rounded-2xl px-5 py-3 flex items-center justify-center gap-3 mb-5">
+                <span className="text-brand-accent text-2xl font-black tracking-widest">{copiedFirm.code}</span>
                 <CheckCircle2 size={18} className="text-green-400" />
               </div>
 
@@ -475,9 +443,9 @@ const LandingPage: React.FC = () => {
                   <h4 className="text-white font-bold text-sm truncate">{copiedFirm.name}</h4>
                   <div className="flex items-center gap-2 mt-0.5">
                     <div className="flex items-center gap-1">
-                      <span className="text-brand-primary text-xs font-bold">{copiedFirm.rating.toFixed(1)}</span>
+                      <span className="text-brand-accent text-xs font-bold">{copiedFirm.rating.toFixed(1)}</span>
                       <div className="flex gap-[1px]">
-                        {[1,2,3,4,5].map(s => <Star key={s} size={9} className={s <= Math.round(copiedFirm.rating) ? 'text-brand-primary fill-brand-primary' : 'text-neutral-700 fill-neutral-700'} />)}
+                        {[1,2,3,4,5].map(s => <Star key={s} size={9} className={s <= Math.round(copiedFirm.rating) ? 'text-brand-accent fill-brand-accent' : 'text-neutral-700 fill-neutral-700'} />)}
                       </div>
                     </div>
                     <span className="text-green-400 text-xs font-bold">{copiedFirm.discount}</span>
@@ -491,7 +459,7 @@ const LandingPage: React.FC = () => {
                   href={copiedFirm.affiliate}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block w-full bg-gradient-to-r from-brand-primary to-yellow-400 text-black font-black text-sm rounded-full py-3 text-center hover:shadow-[0_6px_30px_-4px_rgba(246,174,19,0.5)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                  className="block w-full bg-brand-gradient text-black font-black text-sm rounded-full py-3 text-center hover:shadow-brand-neon hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
                 >
                   Visit {copiedFirm.name} →
                 </a>
@@ -506,25 +474,25 @@ const LandingPage: React.FC = () => {
         {/* Background */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0908] via-black to-[#0a0908]"></div>
         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-brand-primary/[0.03] rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-brand-accent/[0.03] rounded-full blur-[120px] pointer-events-none"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Section Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
             <div>
-              <div className="inline-flex items-center gap-2 bg-brand-primary/[0.08] border border-brand-primary/20 rounded-full px-4 py-1.5 mb-4 backdrop-blur-sm">
-                <Trophy className="w-3.5 h-3.5 text-brand-primary" />
-                <span className="text-[10px] font-bold text-brand-primary uppercase tracking-widest">Top Performers 2026</span>
+              <div className="inline-flex items-center gap-2 bg-brand-accent/[0.08] border border-brand-accent/20 rounded-full px-4 py-1.5 mb-4 backdrop-blur-sm">
+                <Trophy className="w-3.5 h-3.5 text-brand-accent" />
+                <span className="text-[10px] font-bold text-brand-accent uppercase tracking-widest">Top Performers 2026</span>
               </div>
               <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3 tracking-tight">
-                Highest Rated <span className="text-gradient-red">Prop Firms</span>
+                Highest Rated <span className="text-brand-accent">{isFutures ? 'Futures' : 'Prop'} Firms</span>
               </h2>
               <p className="text-neutral-400 text-sm max-w-xl leading-relaxed">
                 Firms that have consistently delivered payouts and transparent trading conditions, vetted by our community.
               </p>
             </div>
-            <Link to="/firms" className="shrink-0">
-              <button className="group flex items-center gap-2 bg-white/[0.03] border border-white/10 px-5 py-2.5 rounded-xl text-white font-semibold text-xs hover:bg-brand-primary hover:text-black hover:border-brand-primary transition-all duration-300">
+            <Link to={getModePath('/firms')} className="shrink-0">
+              <button className="group flex items-center gap-2 bg-white/[0.03] border border-white/10 px-5 py-2.5 rounded-xl text-white font-semibold text-xs hover:bg-brand-accent hover:text-black hover:border-brand-accent transition-all duration-300">
                 View All Firms <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
               </button>
             </Link>
@@ -544,9 +512,9 @@ const LandingPage: React.FC = () => {
 
           {/* Bottom CTA */}
           <div className="mt-14 text-center">
-            <Link to="/firms">
-              <button className="group inline-flex items-center gap-3 px-8 py-4 bg-white/[0.03] border border-white/10 text-white font-bold rounded-2xl hover:bg-brand-primary hover:text-black hover:border-brand-primary transition-all duration-300 shadow-[0_0_30px_rgba(0,0,0,0.3)]">
-                <span>Explore All Prop Firms</span>
+            <Link to={getModePath('/firms')}>
+              <button className="group inline-flex items-center gap-3 px-8 py-4 bg-white/[0.03] border border-white/10 text-white font-bold rounded-2xl hover:bg-brand-accent hover:text-black hover:border-brand-accent transition-all duration-300 shadow-brand-glow">
+                <span>Explore All {isFutures ? 'Futures' : 'Prop'} Firms</span>
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </button>
             </Link>
@@ -568,19 +536,19 @@ const LandingPage: React.FC = () => {
 
         {/* Section background */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0908] via-[#111010] to-[#0a0908]"></div>
-        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-primary/20 to-transparent"></div>
-        <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-primary/20 to-transparent"></div>
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-accent/20 to-transparent"></div>
+        <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-accent/20 to-transparent"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
           {/* Section Header */}
           <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 bg-brand-primary/[0.08] border border-brand-primary/20 rounded-full px-4 py-1.5 mb-5">
-              <Award className="w-3.5 h-3.5 text-brand-primary" />
-              <span className="text-[10px] font-bold text-brand-primary uppercase tracking-widest">Why We're Different</span>
+            <div className="inline-flex items-center gap-2 bg-brand-accent/[0.08] border border-brand-accent/20 rounded-full px-4 py-1.5 mb-5">
+              <Award className="w-3.5 h-3.5 text-brand-accent" />
+              <span className="text-[10px] font-bold text-brand-accent uppercase tracking-widest">Why We're Different</span>
             </div>
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tight">
-              Built for <span className="text-gradient-red">Serious Traders</span>
+              Built for <span className="text-brand-accent">Serious Traders</span>
             </h2>
             <p className="text-neutral-400 max-w-xl mx-auto text-sm leading-relaxed">
               Everything you need to find, compare, and get funded by the right prop firm &mdash; backed by real data.
@@ -597,10 +565,10 @@ const LandingPage: React.FC = () => {
             ].map((stat, i) => (
               <div key={i} className="group relative rounded-xl bg-[#0a0a0a] border border-[#1f1f1f] p-5 text-center hover:border-[#333] transition-all overflow-hidden">
                 <div className="relative z-10">
-                  <div className="w-8 h-8 rounded-lg bg-[#111] border border-[#222] flex items-center justify-center text-brand-primary mx-auto mb-3 group-hover:bg-[#1a1a1a] transition-colors">
+                  <div className="w-8 h-8 rounded-lg bg-[#111] border border-[#222] flex items-center justify-center text-brand-accent mx-auto mb-3 group-hover:bg-[#1a1a1a] transition-colors">
                     {stat.icon}
                   </div>
-                  <div className="text-2xl md:text-3xl font-bold text-white mb-0.5 tracking-tight group-hover:text-brand-primary transition-colors">{stat.value}</div>
+                  <div className="text-2xl md:text-3xl font-bold text-white mb-0.5 tracking-tight group-hover:text-brand-accent transition-colors">{stat.value}</div>
                   <div className="text-neutral-500 text-[9px] uppercase tracking-wider font-bold">{stat.label}</div>
                 </div>
               </div>
@@ -616,7 +584,7 @@ const LandingPage: React.FC = () => {
                 {/* Text Side */}
                 <div className="flex-1 flex flex-col justify-between">
                   <div>
-                    <div className="w-10 h-10 bg-[#111] border border-[#222] rounded-xl flex items-center justify-center text-brand-primary mb-4 shadow-sm group-hover:bg-[#1a1a1a] transition-all">
+                    <div className="w-10 h-10 bg-[#111] border border-[#222] rounded-xl flex items-center justify-center text-brand-accent mb-4 shadow-sm group-hover:bg-[#1a1a1a] transition-all">
                       <TrendingUp size={18} />
                     </div>
                     <h3 className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight">Deep Data Comparison</h3>
@@ -636,11 +604,11 @@ const LandingPage: React.FC = () => {
                   <div className="bg-[#111] border border-[#222] rounded-xl overflow-hidden group-hover:border-[#333] transition-colors">
                     <div className="px-4 py-2.5 border-b border-[#222] flex items-center justify-between bg-[#0a0a0a]">
                       <div className="flex items-center gap-1.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-brand-primary animate-pulse"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse"></div>
                         <span className="text-[9px] text-neutral-400 uppercase tracking-widest font-bold">Live Comparison</span>
                       </div>
                       <div className="flex gap-1.5">
-                        <span className="text-[8px] font-bold text-brand-primary bg-brand-primary/10 px-2 py-0.5 rounded border border-brand-primary/20">FTMO</span>
+                        <span className="text-[8px] font-bold text-brand-accent bg-brand-accent/10 px-2 py-0.5 rounded border border-brand-accent/20">{isFutures ? 'Topstep' : 'FTMO'}</span>
                         <span className="text-[8px] font-bold text-neutral-500 bg-[#1a1a1a] px-2 py-0.5 rounded border border-[#333]">Other</span>
                       </div>
                     </div>
@@ -655,13 +623,13 @@ const LandingPage: React.FC = () => {
                           <div className="flex items-center justify-between text-[10px] mb-1.5">
                             <span className="text-neutral-500 font-bold">{row.metric}</span>
                             <div className="flex items-center gap-2">
-                              <span className="font-bold text-brand-primary">{row.a}</span>
+                              <span className="font-bold text-brand-accent">{row.a}</span>
                               <span className="text-neutral-600 text-[8px]">vs</span>
                               <span className="font-bold text-neutral-400">{row.b}</span>
                             </div>
                           </div>
                           <div className="w-full bg-[#0a0a0a] rounded-full h-1 border border-[#1f1f1f]">
-                            <div className="bg-brand-primary h-1 rounded-full" style={{ width: `${row.pct}%` }}></div>
+                            <div className="bg-brand-accent h-1 rounded-full" style={{ width: `${row.pct}%` }}></div>
                           </div>
                         </div>
                       ))}
@@ -674,14 +642,14 @@ const LandingPage: React.FC = () => {
             {/* CARD: Exclusive Deals (4 col) */}
             <div className="lg:col-span-4 relative rounded-2xl bg-[#0a0a0a] border border-[#1f1f1f] overflow-hidden group hover:border-[#333] transition-colors">
               {/* Top Accent Line */}
-              <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-brand-primary via-amber-500 to-transparent"></div>
+              <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-brand-accent via-amber-500 to-transparent"></div>
               <div className="relative z-10 p-6 flex flex-col h-full justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <div className="w-10 h-10 bg-[#111] border border-[#222] rounded-xl flex items-center justify-center text-brand-primary shadow-sm group-hover:bg-[#1a1a1a] transition-all">
+                    <div className="w-10 h-10 bg-[#111] border border-[#222] rounded-xl flex items-center justify-center text-brand-accent shadow-sm group-hover:bg-[#1a1a1a] transition-all">
                       <Zap size={18} />
                     </div>
-                    <span className="text-[8px] font-bold text-brand-primary uppercase tracking-widest bg-brand-primary/10 px-2 py-1 rounded border border-brand-primary/20">Exclusive</span>
+                    <span className="text-[8px] font-bold text-brand-accent uppercase tracking-widest bg-brand-accent/10 px-2 py-1 rounded border border-brand-accent/20">Exclusive</span>
                   </div>
                   <h3 className="text-xl font-bold text-white mb-2">Deal Flow</h3>
                   <p className="text-neutral-400 text-xs leading-relaxed mb-5">
@@ -695,12 +663,12 @@ const LandingPage: React.FC = () => {
                     { firm: 'Funding Pips', discount: '20% OFF', savings: '$80', hot: true },
                     { firm: 'The5ers', discount: '10% OFF', savings: '$30', hot: false },
                   ].map((deal, i) => (
-                    <div key={i} className={`flex items-center justify-between rounded-lg px-3 py-2 border transition-all ${deal.hot ? 'bg-brand-primary/5 border-brand-primary/20' : 'bg-[#111] border-[#222]'} group-hover:border-[#333]`}>
+                    <div key={i} className={`flex items-center justify-between rounded-lg px-3 py-2 border transition-all ${deal.hot ? 'bg-brand-accent/5 border-brand-accent/20' : 'bg-[#111] border-[#222]'} group-hover:border-[#333]`}>
                       <div>
                         <span className="font-bold text-white text-[11px] block">{deal.firm}</span>
                         <span className="text-[9px] text-neutral-500 font-medium">Save {deal.savings}</span>
                       </div>
-                      <span className={`text-[10px] font-bold px-2 py-1 rounded-md ${deal.hot ? 'bg-brand-primary text-black' : 'bg-[#1a1a1a] text-brand-primary border border-[#333]'}`}>{deal.discount}</span>
+                      <span className={`text-[10px] font-bold px-2 py-1 rounded-md ${deal.hot ? 'bg-brand-accent text-black' : 'bg-[#1a1a1a] text-brand-accent border border-[#333]'}`}>{deal.discount}</span>
                     </div>
                   ))}
                 </div>
@@ -794,10 +762,10 @@ const LandingPage: React.FC = () => {
                   </div>
                   <div className="p-3 space-y-2.5">
                     {[
-                      { user: 'JT', action: 'verified a $12.4K payout from', firm: 'FTMO', color: 'text-brand-primary' },
-                      { user: 'MK', action: 'left a 5-star review on', firm: 'Funding Pips', color: 'text-violet-400' },
-                      { user: 'AS', action: 'saved $240 using discount at', firm: 'The5ers', color: 'text-emerald-400' },
-                      { user: 'DL', action: 'compared 3 firms and chose', firm: 'E8 Markets', color: 'text-blue-400' },
+                      { user: 'JT', action: 'verified a $12.4K payout from', firm: isFutures ? 'Apex Trader' : 'FTMO', color: 'text-brand-accent' },
+                      { user: 'MK', action: 'left a 5-star review on', firm: isFutures ? 'Topstep' : 'Funding Pips', color: 'text-violet-400' },
+                      { user: 'AS', action: 'saved $240 using discount at', firm: isFutures ? 'MyFundedFutures' : 'The5ers', color: 'text-emerald-400' },
+                      { user: 'DL', action: 'compared 3 firms and chose', firm: isFutures ? 'Earn2Trade' : 'E8 Markets', color: 'text-blue-400' },
                     ].map((item, i) => (
                       <div key={i} className="flex items-start gap-2">
                         <div className="w-5 h-5 rounded-md bg-[#1a1a1a] border border-[#333] flex items-center justify-center text-[7px] font-bold text-violet-300 flex-shrink-0 mt-0.5">{item.user}</div>
@@ -819,25 +787,25 @@ const LandingPage: React.FC = () => {
       <section className="py-28 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0908] via-[#0d0c0a] to-[#0a0908]"></div>
         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-        <div className="absolute top-1/2 right-0 w-[400px] h-[400px] bg-brand-primary/[0.02] rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute top-1/2 right-0 w-[400px] h-[400px] bg-brand-accent/[0.02] rounded-full blur-[120px] pointer-events-none"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Header */}
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between mb-16 gap-6">
             <div>
-              <div className="inline-flex items-center gap-2 bg-brand-primary/[0.08] border border-brand-primary/20 rounded-full px-5 py-2 mb-6 backdrop-blur-sm">
-                <Terminal className="w-4 h-4 text-brand-primary" />
-                <span className="text-xs font-bold text-brand-primary uppercase tracking-widest">Simple Process</span>
+              <div className="inline-flex items-center gap-2 bg-brand-accent/[0.08] border border-brand-accent/20 rounded-full px-5 py-2 mb-6 backdrop-blur-sm">
+                <Terminal className="w-4 h-4 text-brand-accent" />
+                <span className="text-xs font-bold text-brand-accent uppercase tracking-widest">Simple Process</span>
               </div>
               <h2 className="text-4xl md:text-6xl font-black text-white mb-4 tracking-tight">
-                How It <span className="text-gradient-red">Works</span>
+                How It <span className="text-brand-accent">Works</span>
               </h2>
               <p className="text-neutral-400 max-w-lg text-base leading-relaxed">
                 From comparison to funded trader in three simple steps. No guesswork, no hidden surprises.
               </p>
             </div>
-            <Link to="/firms" className="shrink-0">
-              <button className="group inline-flex items-center gap-2 bg-gradient-to-r from-brand-primary to-amber-500 hover:from-amber-500 hover:to-brand-primary text-black font-bold text-sm px-6 py-3 rounded-xl transition-all duration-300 shadow-[0_4px_15px_rgba(246,174,19,0.2)]">
+            <Link to={getModePath('/firms')} className="shrink-0">
+              <button className="group inline-flex items-center gap-2 bg-brand-gradient hover:bg-brand-neon text-black font-bold text-sm px-6 py-3 rounded-xl transition-all duration-300 shadow-brand-glow">
                 Get Started Free <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </button>
             </Link>
@@ -896,7 +864,7 @@ const LandingPage: React.FC = () => {
 
                   {/* Right: Highlight Stat */}
                   <div className="md:w-[140px] shrink-0 text-right hidden md:block">
-                    <div className="text-2xl font-black text-brand-primary">{item.highlight}</div>
+                    <div className="text-2xl font-black text-brand-accent">{item.highlight}</div>
                     <div className="text-[10px] text-neutral-500 uppercase tracking-wider font-semibold">{item.highlightSub}</div>
                   </div>
                 </div>
@@ -916,12 +884,12 @@ const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Header */}
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-brand-primary/[0.08] border border-brand-primary/20 rounded-full px-5 py-2 mb-6 backdrop-blur-sm">
-              <Star className="w-4 h-4 text-brand-primary fill-brand-primary" />
-              <span className="text-xs font-bold text-brand-primary uppercase tracking-widest">Trader Stories</span>
+            <div className="inline-flex items-center gap-2 bg-brand-accent/[0.08] border border-brand-accent/20 rounded-full px-5 py-2 mb-6 backdrop-blur-sm">
+              <Star className="w-4 h-4 text-brand-accent fill-brand-accent" />
+              <span className="text-xs font-bold text-brand-accent uppercase tracking-widest">Trader Stories</span>
             </div>
             <h2 className="text-4xl md:text-6xl font-black text-white mb-5 tracking-tight">
-              What Traders <span className="text-gradient-red">Say</span>
+              What Traders <span className="text-brand-accent">Say</span>
             </h2>
             <p className="text-neutral-400 max-w-2xl mx-auto text-lg leading-relaxed">
               Real traders, real results. Hear from our community of 50,000+ funded traders.
@@ -931,16 +899,16 @@ const LandingPage: React.FC = () => {
           {/* Featured Testimonial */}
           <div className="mb-5">
             <div className="group relative rounded-2xl overflow-hidden">
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-brand-primary/20 via-brand-primary/10 to-white/[0.02]"></div>
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-brand-accent/20 via-brand-accent/10 to-white/[0.02]"></div>
               <div className="absolute inset-[1px] rounded-2xl bg-[#0c0b09]"></div>
               <div className="relative z-[2] p-8 md:p-10 flex flex-col md:flex-row gap-8 items-center">
                 <div className="flex flex-col items-center md:items-start gap-4 md:w-[200px] shrink-0">
-                  <div className="w-16 h-16 rounded-2xl bg-brand-primary flex items-center justify-center text-xl font-black text-black shadow-lg shadow-brand-primary/10">JT</div>
+                  <div className="w-16 h-16 rounded-2xl bg-brand-accent flex items-center justify-center text-xl font-black text-black shadow-lg shadow-brand-accent/10">JT</div>
                   <div className="text-center md:text-left">
                     <div className="text-white font-bold text-lg">James T.</div>
                     <div className="text-neutral-500 text-sm">Funded Trader</div>
                     <div className="flex items-center gap-0.5 mt-2 justify-center md:justify-start">
-                      {[1, 2, 3, 4, 5].map(s => (<Star key={s} className="w-3.5 h-3.5 text-brand-primary fill-brand-primary" />))}
+                      {[1, 2, 3, 4, 5].map(s => (<Star key={s} className="w-3.5 h-3.5 text-brand-accent fill-brand-accent" />))}
                     </div>
                   </div>
                   <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-2 text-center">
@@ -949,12 +917,12 @@ const LandingPage: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex-1">
-                  <div className="text-brand-primary/20 text-6xl font-serif leading-none mb-4">"</div>
+                  <div className="text-brand-accent/20 text-6xl font-serif leading-none mb-4">"</div>
                   <p className="text-neutral-200 text-lg md:text-xl leading-relaxed font-medium -mt-8">
                     PropNoble saved me $380 on my FTMO challenge and helped me find a firm with same-day payouts. The comparison tool is a game-changer — I compared 12 firms in 5 minutes and found the perfect one for my trading style. The TrustGuard score gave me confidence I wasn't throwing money away. Every funded trader needs this platform.
                   </p>
                   <div className="mt-6 flex flex-wrap gap-2">
-                    <span className="text-[11px] font-semibold bg-brand-primary/10 text-brand-primary px-3 py-1.5 rounded-lg border border-brand-primary/20">Saved $380</span>
+                    <span className="text-[11px] font-semibold bg-brand-accent/10 text-brand-accent px-3 py-1.5 rounded-lg border border-brand-accent/20">Saved $380</span>
                     <span className="text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 px-3 py-1.5 rounded-lg border border-emerald-500/20">Same-day payout</span>
                     <span className="text-[11px] font-semibold bg-violet-500/10 text-violet-400 px-3 py-1.5 rounded-lg border border-violet-500/20">Compared 12 firms</span>
                   </div>
@@ -980,7 +948,7 @@ const LandingPage: React.FC = () => {
               },
             ].map((item, i) => (
               <div key={i} className="group relative rounded-2xl overflow-hidden">
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/[0.08] via-white/[0.04] to-white/[0.02] group-hover:from-brand-primary/25 group-hover:via-brand-primary/10 group-hover:to-transparent transition-all duration-500"></div>
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/[0.08] via-white/[0.04] to-white/[0.02] group-hover:from-brand-accent/25 group-hover:via-brand-accent/10 group-hover:to-transparent transition-all duration-500"></div>
                 <div className="absolute inset-[1px] rounded-2xl bg-[#0c0b09]"></div>
                 <div className="relative z-[2] p-7">
                   <div className="flex items-start justify-between mb-5">
@@ -992,7 +960,7 @@ const LandingPage: React.FC = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-0.5">
-                      {[1, 2, 3, 4, 5].map(s => (<Star key={s} className="w-3.5 h-3.5 text-brand-primary fill-brand-primary" />))}
+                      {[1, 2, 3, 4, 5].map(s => (<Star key={s} className="w-3.5 h-3.5 text-brand-accent fill-brand-accent" />))}
                     </div>
                   </div>
                   <p className="text-neutral-300 text-sm leading-relaxed mb-5">"{item.quote}"</p>
@@ -1012,7 +980,7 @@ const LandingPage: React.FC = () => {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 bg-white/[0.02] border border-white/[0.06] rounded-2xl p-6">
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-0.5">
-                {[1, 2, 3, 4, 5].map(s => (<Star key={s} className="w-5 h-5 text-brand-primary fill-brand-primary" />))}
+                {[1, 2, 3, 4, 5].map(s => (<Star key={s} className="w-5 h-5 text-brand-accent fill-brand-accent" />))}
               </div>
               <span className="text-white font-black text-xl ml-2">4.9</span>
               <span className="text-neutral-500 text-sm">/5</span>

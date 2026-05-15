@@ -40,7 +40,7 @@ export interface PropFirm {
   challenges?: Challenge[];
   status?: 'active' | 'draft' | 'inactive';
   show_in_hero?: boolean; // Added for Hero showcase toggle feature
-  promoCode?: string; // Promo code for the firm (e.g., "SPOT")
+  promoCode?: string; // Promo code for the firm (e.g., "NOBLE")
   discountValue?: number; // Discount percentage value
   promo_code?: string; // DB field alias
   discount_value?: number; // DB field alias
@@ -55,6 +55,7 @@ export interface PropFirm {
   payoutPercentage?: number;
   last30DaysPayouts?: string;
   payoutGrowth?: string;
+  trading_type?: 'forex' | 'futures';
 }
 
 export interface Review {

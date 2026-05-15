@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Shield, ExternalLink, CheckCircle, ChevronRight, Calendar, MapPin, Star, Heart, MessageSquare, TrendingUp, ArrowRight, Zap, Trophy, ShieldCheck, CreditCard, Layout, Layers, Info, History } from 'lucide-react';
 import Button from '../components/Button';
 import FirmCard from '../components/FirmCard';
 import FirmLogo from '../components/FirmLogo';
 import PlatformLogo from '../components/PlatformLogo';
-import { FirmService, generateSlug, generateFakeUserForReview } from '../lib/services';
+import { FirmService, generateSlug, generateFakeUserForReview, mapFirmFromDB } from '../lib/services';
 import { PropFirm } from '../types';
 import { formatFunding } from '../lib/format';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabaseClient';
+import { useTradeMode } from '../context/TradeModeContext';
 import { useModal } from '../context/ModalContext';
 
 const getCountryFlag = (location: string): string => {
@@ -50,11 +51,15 @@ const getCountryFlag = (location: string): string => {
 };
 
 const FirmDetailPage: React.FC = () => {
+  const { mode, getModePath } = useTradeMode();
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const [firm, setFirm] = useState<PropFirm | null>(null);
   const [loading, setLoading] = useState(true);
   const { showModal } = useModal();
+  const isFutures = mode === 'futures';
 
   const [isSaved, setIsSaved] = useState(false);
   const [reviews, setReviews] = useState<any[]>([]);
@@ -78,6 +83,19 @@ const FirmDetailPage: React.FC = () => {
 
     fetchFirmDetails();
   }, [id]);
+
+  useEffect(() => {
+    if (firm) {
+      const isFuturesFirm = firm.trading_type === 'futures' || firm.tags?.some(t => t.toLowerCase() === 'futures');
+      const isCurrentlyFutures = location.pathname.startsWith('/futures');
+      
+      if (isFuturesFirm && !isCurrentlyFutures) {
+        navigate(`/futures/firm/${id}`, { replace: true });
+      } else if (!isFuturesFirm && isCurrentlyFutures) {
+        navigate(`/firm/${id}`, { replace: true });
+      }
+    }
+  }, [firm, location.pathname, navigate, id]);
 
   useEffect(() => {
     if (!firm?.id) return;
@@ -112,17 +130,19 @@ const FirmDetailPage: React.FC = () => {
             .select('*, challenges(*)')
             .neq('id', firm.id)
             .eq('status', 'active')
-            .limit(3);
+            .limit(10); // Fetch a few more to filter in JS
 
         if (data && !error) {
-          setSimilarFirms(data.map(f => ({
-            ...f,
-            logo: f.logo_url,
-            rating: Number(f.rating) || 0,
-            reviewCount: Number(f.review_count) || 0,
-            maxFunding: 200000, // Placeholder mapping or use actual logic from mapFirmFromDB
-            challenges: f.challenges || []
-          })) as any);
+          const allSimilar = data.map(mapFirmFromDB);
+          const filtered = allSimilar.filter(f => {
+            if (firm.trading_type === 'futures') {
+                return f.trading_type === 'futures' || f.tags?.some(t => t.toLowerCase() === 'futures');
+            } else {
+                return f.trading_type !== 'futures' && !f.tags?.some(t => t.toLowerCase() === 'futures');
+            }
+          }).slice(0, 3);
+          
+          setSimilarFirms(filtered);
         }
       } catch (err) {
         console.error('Error fetching similar firms:', err);
@@ -163,7 +183,7 @@ const FirmDetailPage: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="relative w-16 h-16">
-          <div className="absolute inset-0 rounded-full border-t-2 border-brand-primary animate-spin"></div>
+          <div className="absolute inset-0 rounded-full border-t-2 border-brand-accent animate-spin"></div>
         </div>
       </div>
     );
@@ -174,7 +194,7 @@ const FirmDetailPage: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
         <div className="text-center">
           <h2 className="text-3xl font-black mb-6 uppercase tracking-widest">Firm Not Found</h2>
-          <Link to="/firms"><Button size="lg">Return to Browse</Button></Link>
+          <Link to={getModePath('/firms')}><Button size="lg">Return to Browse</Button></Link>
         </div>
       </div>
     );
@@ -184,27 +204,27 @@ const FirmDetailPage: React.FC = () => {
     <div className="pt-24 min-h-screen bg-black text-white font-sans relative overflow-hidden">
       {/* Background Ambience */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-10%] right-[-5%] w-[60%] h-[60%] bg-brand-primary/5 rounded-full blur-[150px] animate-aurora"></div>
-        <div className="absolute bottom-[20%] left-[-10%] w-[40%] h-[40%] bg-brand-primary/10 rounded-full blur-[120px] animate-aurora-reverse"></div>
+        <div className="absolute top-[-10%] right-[-5%] w-[60%] h-[60%] bg-brand-accent/5 rounded-full blur-[150px] animate-aurora"></div>
+        <div className="absolute bottom-[20%] left-[-10%] w-[40%] h-[40%] bg-brand-accent/10 rounded-full blur-[120px] animate-aurora-reverse"></div>
         <div className="absolute inset-0 bg-grid-white opacity-[0.02]"></div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
         {/* Breadcrumbs */}
         <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-neutral-500 mb-10 animate-fade-in-up">
-            <Link to="/firms" className="hover:text-brand-primary transition-colors">Firms</Link>
+            <Link to={getModePath('/firms')} className="hover:text-brand-accent transition-colors">Firms</Link>
             <ChevronRight size={12} />
             <span className="text-white">{firm.name}</span>
         </div>
 
         {/* Profile Header Card */}
         <div className="bg-[#0a0a0a]/60 backdrop-blur-3xl border border-white/5 rounded-[40px] p-8 md:p-12 mb-12 shadow-2xl relative overflow-hidden animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-            <div className="absolute top-0 right-0 w-64 h-64 bg-brand-primary/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-brand-accent/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
             
             <div className="flex flex-col lg:flex-row gap-10 items-start lg:items-center relative z-10">
                 {/* Logo Section */}
                 <div className="relative group">
-                    <div className="absolute inset-0 bg-brand-primary/20 rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                    <div className="absolute inset-0 bg-brand-accent/20 rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                     <div className="relative bg-[#111] border border-white/5 p-4 rounded-[32px] shadow-2xl w-32 h-32 md:w-44 md:h-44 flex items-center justify-center overflow-hidden">
                         <FirmLogo src={firm.logo} alt={firm.name} className="w-full h-full object-contain" />
                     </div>
@@ -221,7 +241,7 @@ const FirmDetailPage: React.FC = () => {
 
                     <div className="flex flex-wrap items-center gap-6 text-sm font-bold text-neutral-400 mb-8">
                         <div className="flex items-center gap-1.5 text-white">
-                            <Star size={18} className="text-brand-primary fill-brand-primary" />
+                            <Star size={18} className="text-brand-accent fill-brand-accent" />
                             <span className="text-lg">{firm.rating}</span>
                             <span className="text-neutral-600 font-medium">({firm.reviewCount} Reviews)</span>
                         </div>
@@ -251,14 +271,14 @@ const FirmDetailPage: React.FC = () => {
                     <div className="flex gap-3">
                         <button 
                             onClick={toggleSave}
-                            className={`w-14 h-14 rounded-2xl border flex items-center justify-center transition-all duration-300 ${isSaved ? 'bg-brand-primary/10 border-brand-primary/30 text-brand-primary' : 'bg-white/5 border-white/10 text-neutral-400 hover:text-white'}`}
+                            className={`w-14 h-14 rounded-2xl border flex items-center justify-center transition-all duration-300 ${isSaved ? 'bg-brand-accent/10 border-brand-accent/30 text-brand-accent' : 'bg-white/5 border-white/10 text-neutral-400 hover:text-white'}`}
                         >
                             <Heart size={24} className={isSaved ? "fill-current" : ""} />
                         </button>
                         <a 
                             href={firm.website} 
                             target="_blank" 
-                            className="flex-1 h-14 rounded-2xl bg-white text-black font-black text-sm uppercase tracking-widest flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all duration-300 shadow-xl active:scale-[0.98]"
+                            className="flex-1 h-14 rounded-2xl bg-white text-black font-black text-sm uppercase tracking-widest flex items-center justify-center hover:bg-brand-accent hover:text-white transition-all duration-300 shadow-xl active:scale-[0.98]"
                         >
                             Visit Website
                         </a>
@@ -266,7 +286,7 @@ const FirmDetailPage: React.FC = () => {
                     
                     {/* Promo Code Floating Container */}
                     <div 
-                        className="bg-[#0d0d0d] border border-white/5 p-4 rounded-2xl flex items-center justify-between group cursor-pointer hover:border-brand-primary/30 transition-all"
+                        className="bg-[#0d0d0d] border border-white/5 p-4 rounded-2xl flex items-center justify-between group cursor-pointer hover:border-brand-accent/30 transition-all"
                         onClick={() => {
                             navigator.clipboard.writeText(firm.discountCode || 'NOBLE');
                             showModal({ type: 'success', title: 'Code Copied!', message: `Promo code "${firm.discountCode || 'NOBLE'}" copied to clipboard!` });
@@ -276,7 +296,7 @@ const FirmDetailPage: React.FC = () => {
                             <span className="text-[8px] font-black uppercase tracking-widest text-neutral-500 mb-1">Exclusive Discount</span>
                             <span className="text-white font-black text-lg tracking-[0.2em]">{firm.discountCode || 'NOBLE'}</span>
                         </div>
-                        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-neutral-500 group-hover:text-brand-primary transition-colors">
+                        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-neutral-500 group-hover:text-brand-accent transition-colors">
                             <CreditCard size={18} />
                         </div>
                     </div>
@@ -296,12 +316,12 @@ const FirmDetailPage: React.FC = () => {
                     <button
                         key={tab.id}
                         onClick={() => scrollToSection(tab.id)}
-                        className={`group py-6 relative flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'text-brand-primary' : 'text-neutral-500 hover:text-white'}`}
+                        className={`group py-6 relative flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'text-brand-accent' : 'text-neutral-500 hover:text-white'}`}
                     >
                         <tab.icon size={14} />
                         {tab.label}
                         {activeTab === tab.id && (
-                            <div className="absolute bottom-0 left-0 w-full h-1 bg-brand-primary rounded-t-full shadow-[0_0_10px_rgba(255,0,0,0.5)]"></div>
+                            <div className="absolute bottom-0 left-0 w-full h-1 bg-brand-accent rounded-t-full shadow-brand-glow"></div>
                         )}
                     </button>
                 ))}
@@ -316,7 +336,7 @@ const FirmDetailPage: React.FC = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
                     <div className="lg:col-span-2">
                         <div className="flex items-center gap-3 mb-8">
-                            <div className="w-2 h-8 bg-brand-primary rounded-full shadow-[0_0_15px_rgba(255,0,0,0.5)]"></div>
+                            <div className="w-2 h-8 bg-brand-accent rounded-full shadow-brand-glow"></div>
                             <h3 className="text-3xl font-black uppercase tracking-tight">The {firm.name} <span className="text-neutral-600">Experience</span></h3>
                         </div>
                         <p className="text-neutral-400 text-lg leading-relaxed font-medium mb-12">
@@ -330,8 +350,8 @@ const FirmDetailPage: React.FC = () => {
                                 { label: 'Founded', value: firm.foundedYear || firm.founded || '2023', icon: History },
                                 { label: 'HQ Location', value: firm.hqLocation || 'Global', icon: MapPin }
                             ].map((item, i) => (
-                                <div key={i} className="bg-[#0a0a0a] border border-white/5 p-6 rounded-3xl hover:border-brand-primary/20 transition-all">
-                                    <div className="w-10 h-10 rounded-xl bg-brand-primary/5 flex items-center justify-center text-brand-primary mb-4 shadow-inner">
+                                <div key={i} className="bg-[#0a0a0a] border border-white/5 p-6 rounded-3xl hover:border-brand-accent/20 transition-all">
+                                    <div className="w-10 h-10 rounded-xl bg-brand-accent/5 flex items-center justify-center text-brand-accent mb-4 shadow-inner">
                                         <item.icon size={20} />
                                     </div>
                                     <div className="text-[8px] font-black uppercase tracking-widest text-neutral-500 mb-1">{item.label}</div>
@@ -342,9 +362,9 @@ const FirmDetailPage: React.FC = () => {
                     </div>
 
                     <div className="bg-[#0a0a0a] border border-white/5 p-8 rounded-[40px] shadow-2xl relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-brand-primary/5 rounded-full blur-[50px]"></div>
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-brand-accent/5 rounded-full blur-[50px]"></div>
                         <h4 className="text-white font-black text-sm uppercase tracking-widest mb-8 flex items-center gap-2">
-                            <Layers className="text-brand-primary" size={16} /> Market Specs
+                            <Layers className="text-brand-accent" size={16} /> Market Specs
                         </h4>
                         <ul className="space-y-6">
                             {[
@@ -377,7 +397,7 @@ const FirmDetailPage: React.FC = () => {
             <section id="rules" className="scroll-mt-48 animate-fade-in-up">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12">
                     <div className="flex items-center gap-3">
-                        <div className="w-2 h-8 bg-brand-primary rounded-full shadow-[0_0_15px_rgba(255,0,0,0.5)]"></div>
+                        <div className="w-2 h-8 bg-brand-accent rounded-full shadow-brand-glow"></div>
                         <h3 className="text-3xl font-black uppercase tracking-tight">Challenge <span className="text-neutral-600">Models</span></h3>
                     </div>
                     
@@ -386,7 +406,7 @@ const FirmDetailPage: React.FC = () => {
                             <button
                                 key={type}
                                 onClick={() => setSelectedChallengeType(type)}
-                                className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${selectedChallengeType === type ? 'bg-brand-primary text-white shadow-lg' : 'text-neutral-500 hover:text-white'}`}
+                                className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${selectedChallengeType === type ? 'bg-brand-accent text-black shadow-lg' : 'text-neutral-500 hover:text-white'}`}
                             >
                                 {type}
                             </button>
@@ -412,18 +432,18 @@ const FirmDetailPage: React.FC = () => {
                                     <tr key={challenge.id} className="group hover:bg-white/[0.02] transition-colors">
                                         <td className="px-10 py-8 font-black text-xl tracking-tight text-white">{challenge.accountSize}</td>
                                         <td className="px-10 py-8">
-                                            <span className="px-3 py-1 rounded-lg bg-brand-primary/10 border border-brand-primary/20 text-brand-primary text-[9px] font-black uppercase tracking-widest">
+                                            <span className="px-3 py-1 rounded-lg bg-brand-accent/10 border border-brand-accent/20 text-brand-accent text-[9px] font-black uppercase tracking-widest">
                                                 {challenge.challengeType}
                                             </span>
                                         </td>
                                         <td className="px-10 py-8 font-black text-neutral-400 uppercase tracking-widest text-xs">{challenge.profitTarget}</td>
                                         <td className="px-10 py-8 font-black text-red-500/80 uppercase tracking-widest text-xs">{challenge.maxDrawdown}</td>
-                                        <td className="px-10 py-8 font-black text-brand-primary text-xl tracking-tight">{challenge.price}</td>
+                                        <td className="px-10 py-8 font-black text-brand-accent text-xl tracking-tight">{challenge.price}</td>
                                         <td className="px-10 py-8 text-right">
                                             <a 
                                                 href={firm.affiliateLink || firm.website} 
                                                 target="_blank"
-                                                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-black text-[10px] font-black uppercase tracking-widest hover:bg-brand-primary hover:text-white transition-all active:scale-[0.95] shadow-lg"
+                                                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-black text-[10px] font-black uppercase tracking-widest hover:bg-brand-accent hover:text-white transition-all active:scale-[0.95] shadow-lg"
                                             >
                                                 Select Account <ArrowRight size={14} />
                                             </a>
@@ -439,7 +459,7 @@ const FirmDetailPage: React.FC = () => {
             {/* Payout Stats Section */}
             <section id="payouts" className="scroll-mt-48 animate-fade-in-up">
                 <div className="flex items-center gap-3 mb-12">
-                    <div className="w-2 h-8 bg-brand-primary rounded-full shadow-[0_0_15px_rgba(255,0,0,0.5)]"></div>
+                    <div className="w-2 h-8 bg-brand-accent rounded-full shadow-brand-glow"></div>
                     <h3 className="text-3xl font-black uppercase tracking-tight">Payout <span className="text-neutral-600">Reliability</span></h3>
                 </div>
 
@@ -451,7 +471,7 @@ const FirmDetailPage: React.FC = () => {
                         </div>
                         <div className="text-5xl font-black text-white mb-6 tracking-tighter uppercase">{firm.avgPayoutTime || '12 Hours'}</div>
                         <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden mb-4">
-                            <div className="h-full bg-brand-primary shadow-[0_0_15px_rgba(255,0,0,0.5)]" style={{ width: '92%' }}></div>
+                            <div className="h-full bg-brand-accent shadow-brand-glow" style={{ width: '92%' }}></div>
                         </div>
                         <p className="text-neutral-500 text-xs font-bold uppercase tracking-wider">92% of withdrawal requests completed within time frame</p>
                     </div>
@@ -473,10 +493,10 @@ const FirmDetailPage: React.FC = () => {
             <section id="reviews" className="scroll-mt-48 pb-24 animate-fade-in-up">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12">
                     <div className="flex items-center gap-3">
-                        <div className="w-2 h-8 bg-brand-primary rounded-full shadow-[0_0_15px_rgba(255,0,0,0.5)]"></div>
+                        <div className="w-2 h-8 bg-brand-accent rounded-full shadow-brand-glow"></div>
                         <h3 className="text-3xl font-black uppercase tracking-tight">Trader <span className="text-neutral-600">Reviews</span></h3>
                     </div>
-                    <Link to={`/firm/${generateSlug(firm.name)}/reviews`}>
+                    <Link to={getModePath(`/firm/${generateSlug(firm.name)}/reviews`)}>
                         <Button variant="outline" size="md">Share Your Experience</Button>
                     </Link>
                 </div>
@@ -486,10 +506,10 @@ const FirmDetailPage: React.FC = () => {
                         reviews.slice(0, 3).map((review) => {
                             const fakeUser = generateFakeUserForReview(review.id);
                             return (
-                                <div key={review.id} className="bg-[#0a0a0a] border border-white/5 p-8 rounded-[32px] hover:border-brand-primary/20 transition-all group shadow-2xl">
+                                <div key={review.id} className="bg-[#0a0a0a] border border-white/5 p-8 rounded-[32px] hover:border-brand-accent/20 transition-all group shadow-2xl">
                                     <div className="flex justify-between items-start mb-6">
                                         <div className="flex gap-4 items-center">
-                                            <div className="w-12 h-12 rounded-2xl bg-brand-primary/10 text-brand-primary flex items-center justify-center font-black uppercase border border-brand-primary/10 shadow-inner group-hover:scale-110 transition-transform">
+                                            <div className="w-12 h-12 rounded-2xl bg-brand-accent/10 text-brand-accent flex items-center justify-center font-black uppercase border border-brand-accent/10 shadow-inner group-hover:scale-110 transition-transform">
                                                 {fakeUser.initial}
                                             </div>
                                             <div>
@@ -499,7 +519,7 @@ const FirmDetailPage: React.FC = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="flex text-brand-primary">
+                                        <div className="flex text-brand-accent">
                                             {[1, 2, 3, 4, 5].map(star => (
                                                 <Star key={star} size={10} className={review.rating >= star ? 'fill-current' : 'text-neutral-800'} />
                                             ))}
@@ -517,7 +537,7 @@ const FirmDetailPage: React.FC = () => {
                             <MessageSquare size={48} className="text-neutral-800 mb-6" />
                             <h4 className="text-white font-black text-xl uppercase tracking-widest mb-2">Be the First to Review</h4>
                             <p className="text-neutral-500 font-medium max-w-xs mb-8">Share your trading experience with {firm.name} and help the community.</p>
-                            <Link to={`/firm/${generateSlug(firm.name)}/reviews`}>
+                            <Link to={getModePath(`/firm/${generateSlug(firm.name)}/reviews`)}>
                                 <Button size="lg">Write a Review</Button>
                             </Link>
                         </div>

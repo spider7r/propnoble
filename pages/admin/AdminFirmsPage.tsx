@@ -53,6 +53,7 @@ interface Firm {
   payout_percentage?: number;
   last_30_days_payouts?: string;
   payout_growth?: string;
+  trading_type?: 'forex' | 'futures';
 }
 
 const AdminFirmsPage: React.FC = () => {
@@ -195,6 +196,7 @@ const AdminFirmsPage: React.FC = () => {
       favicon: formData.get('favicon') as string,
       rating: parseFloat(formData.get('rating') as string) || 0,
       status: formData.get('status') as string,
+      trading_type: formData.get('trading_type') as string || 'forex',
       description: formData.get('description') as string,
       founded_year: formData.get('founded_year') as string,
       hq_location: formData.get('hq_location') as string,
@@ -430,6 +432,13 @@ const AdminFirmsPage: React.FC = () => {
                         <option value="active">Active (Visible)</option>
                         <option value="draft">Draft (Hidden)</option>
                         <option value="inactive">Inactive</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-brand-muted uppercase">Trading Type (Mode)</label>
+                      <select name="trading_type" defaultValue={selectedFirm?.trading_type || 'forex'} className="w-full bg-background-dark border border-brand-border rounded-lg p-3 text-white focus:border-brand-gold outline-none">
+                        <option value="forex">Forex (Default)</option>
+                        <option value="futures">Futures</option>
                       </select>
                     </div>
                   </div>

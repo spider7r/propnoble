@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { PropFirm } from '../types';
 import { useComparison } from '../context/ComparisonContext';
+import { useTradeMode } from '../context/TradeModeContext';
 import { formatFunding } from '../lib/format';
 import FirmLogo from './FirmLogo';
 import PlatformLogo from './PlatformLogo';
@@ -16,6 +17,7 @@ interface FirmCardProps {
 
 const FirmCard: React.FC<FirmCardProps> = ({ firm, className, rank }) => {
   const { toggleFirm, isInComparison } = useComparison();
+  const { getModePath } = useTradeMode();
   const isSelected = isInComparison(firm.id);
 
   const getFaviconUrl = () => {
@@ -76,7 +78,7 @@ const FirmCard: React.FC<FirmCardProps> = ({ firm, className, rank }) => {
           <div className="flex flex-col items-end">
             <div className="flex items-center gap-[1px] mb-1">
               {[1, 2, 3, 4, 5].map((s) => (
-                <Star key={s} size={11} className={s <= Math.round(firm.rating) ? "text-brand-primary fill-brand-primary" : "text-[#222] fill-[#222]"} />
+                <Star key={s} size={11} className={s <= Math.round(firm.rating) ? "text-brand-accent fill-brand-accent" : "text-[#222] fill-[#222]"} />
               ))}
             </div>
             <span className="text-[10px] font-bold text-neutral-400">{firm.rating}/5 ({firm.reviewCount || 0})</span>
@@ -94,7 +96,7 @@ const FirmCard: React.FC<FirmCardProps> = ({ firm, className, rank }) => {
           </div>
           {/* Profit Split */}
           <div className="bg-[#111] border border-[#1f1f1f] rounded-lg py-3 flex flex-col items-center justify-center">
-            <span className="block text-sm font-bold text-brand-primary mb-0.5">{splitNum}%</span>
+            <span className="block text-sm font-bold text-brand-accent mb-0.5">{splitNum}%</span>
             <span className="block text-[8px] uppercase tracking-wider text-neutral-500 font-bold">Profit Split</span>
           </div>
           {/* Drawdown */}
@@ -109,11 +111,11 @@ const FirmCard: React.FC<FirmCardProps> = ({ firm, className, rank }) => {
       <div className="px-5 pb-4">
         <div className="flex justify-between items-center mb-1.5">
           <span className="text-[9px] text-neutral-500 font-semibold uppercase tracking-wider">Profit Split</span>
-          <span className="text-[10px] text-brand-primary font-bold">{splitNum}%</span>
+          <span className="text-[10px] text-brand-accent font-bold">{splitNum}%</span>
         </div>
         <div className="h-1.5 w-full bg-[#1f1f1f] rounded-full overflow-hidden">
           <div 
-            className="h-full rounded-full bg-brand-primary"
+            className="h-full rounded-full bg-brand-accent"
             style={{ width: `${splitNum}%` }}
           ></div>
         </div>
@@ -132,8 +134,8 @@ const FirmCard: React.FC<FirmCardProps> = ({ firm, className, rank }) => {
 
       {/* Footer Actions */}
       <div className="px-5 pb-5 mt-auto flex items-center gap-3">
-        <Link to={`/firm/${generateSlug(firm.name)}`} className="flex-1">
-          <button className="w-full h-10 flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-brand-primary to-[#ff6b00] hover:from-[#ff6b00] hover:to-brand-primary text-white font-bold text-[13px] transition-all shadow-[0_0_15px_rgba(255,51,0,0.15)]">
+        <Link to={getModePath(`/firm/${generateSlug(firm.name)}`)} className="flex-1">
+          <button className="w-full h-10 flex items-center justify-center gap-1.5 rounded-lg bg-brand-gradient hover:bg-brand-neon text-white font-bold text-[13px] transition-all shadow-brand-glow">
             View Firm
             <ArrowUpRight size={14} strokeWidth={2.5} />
           </button>
@@ -143,7 +145,7 @@ const FirmCard: React.FC<FirmCardProps> = ({ firm, className, rank }) => {
           onClick={() => toggleFirm(firm)}
           className={`shrink-0 w-[100px] h-10 flex items-center justify-center gap-1.5 rounded-lg border font-bold text-[11px] transition-all ${
             isSelected
-            ? 'bg-brand-primary/10 border-brand-primary/30 text-brand-primary'
+            ? 'bg-brand-accent/10 border-brand-accent/30 text-brand-accent'
             : 'bg-[#111] border-[#333] text-neutral-400 hover:bg-[#1a1a1a] hover:text-white'
           }`}
         >

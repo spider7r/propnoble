@@ -1,21 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Search, User } from 'lucide-react';
+import { Menu, X, User } from 'lucide-react';
 import Button from './Button';
 import { useAuth } from '../context/AuthContext';
+import { useTradeMode } from '../context/TradeModeContext';
+import ModeToggle from './ModeToggle';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { user } = useAuth();
+  const { mode, getModePath } = useTradeMode();
 
   const navLinks = [
-    { name: 'Browse Firms', path: '/firms' },
-    { name: 'Competitions', path: '/competitions' },
-    { name: 'Offers', path: '/offers' },
-    { name: 'Reviews', path: '/reviews' },
-    { name: 'Blog', path: '/blog' },
-    { name: '⚡ Noble AI', path: '/spot-ai' },
+    { name: 'Browse Firms', path: getModePath('/firms') },
+    { name: 'Competitions', path: getModePath('/competitions') },
+    { name: 'Offers', path: getModePath('/offers') },
+    { name: 'Reviews', path: getModePath('/reviews') },
+    { name: 'Blog', path: getModePath('/blog') },
+    { name: '⚡ Noble AI', path: getModePath('/noble-ai') },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -25,8 +28,8 @@ const Navbar: React.FC = () => {
       <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-full">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <img src="/nobel-logo.png" alt="PropNoble" className="h-16 w-auto" />
+          <Link to={getModePath('/')} className="flex items-center gap-2 group">
+            <img src={mode === 'futures' ? '/nobelf-logo.png' : '/nobel-logo.png'} alt="PropNoble" className="h-16 w-auto" />
           </Link>
 
           {/* Desktop Nav */}
@@ -47,7 +50,7 @@ const Navbar: React.FC = () => {
                   key={link.path}
                   to={link.path}
                   className={`text-sm font-medium px-5 py-2 rounded-full transition-all ${isActive(link.path)
-                    ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20'
+                    ? 'bg-brand-accent text-white shadow-lg shadow-brand-glow'
                     : 'text-brand-muted hover:text-white hover:bg-white/5'
                     }`}
                 >
@@ -59,20 +62,21 @@ const Navbar: React.FC = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-4">
-
+            <ModeToggle />
+            
             {user ? (
-              <Link to="/dashboard">
-                <Button variant="secondary" size="sm" className="gap-2 bg-brand-primary/10 text-brand-primary border-brand-primary/20 hover:bg-brand-primary hover:text-white">
+              <Link to={getModePath('/dashboard')}>
+                <Button variant="secondary" size="sm" className="gap-2 bg-brand-accent/10 text-brand-accent border-brand-accent/20 hover:bg-brand-accent hover:text-white">
                   <User size={16} /> Dashboard
                 </Button>
               </Link>
             ) : (
               <div className="flex items-center gap-3">
-                <Link to="/login" className="text-sm font-medium text-brand-muted hover:text-white transition-colors">
+                <Link to={getModePath('/login')} className="text-sm font-medium text-brand-muted hover:text-white transition-colors">
                   Log In
                 </Link>
-                <Link to="/signup">
-                  <Button size="sm" className="bg-brand-primary text-white hover:bg-white hover:text-black border-none shadow-glow">
+                <Link to={getModePath('/signup')}>
+                  <Button size="sm" className="bg-brand-accent text-white hover:bg-white hover:text-black border-none shadow-brand-glow">
                     Get Funded
                   </Button>
                 </Link>
@@ -119,22 +123,26 @@ const Navbar: React.FC = () => {
                 </Link>
               )
             ))}
+            <div className="pt-2 pb-4">
+              <ModeToggle />
+            </div>
+
             <div className="pt-4 border-t border-brand-border mt-4 space-y-3">
               {user ? (
-                <Link to="/dashboard" onClick={() => setIsOpen(false)}>
-                  <Button className="w-full justify-center gap-2 bg-brand-primary text-white">
+                <Link to={getModePath('/dashboard')} onClick={() => setIsOpen(false)}>
+                  <Button className="w-full justify-center gap-2 bg-brand-accent text-white">
                     <User size={18} /> Dashboard
                   </Button>
                 </Link>
               ) : (
                 <>
-                  <Link to="/login" onClick={() => setIsOpen(false)}>
+                  <Link to={getModePath('/login')} onClick={() => setIsOpen(false)}>
                     <Button variant="secondary" className="w-full justify-center border-brand-charcoal hover:bg-brand-charcoal">
                       Log In
                     </Button>
                   </Link>
-                  <Link to="/signup" onClick={() => setIsOpen(false)}>
-                    <Button className="w-full justify-center bg-brand-primary text-white border-none shadow-glow">
+                  <Link to={getModePath('/signup')} onClick={() => setIsOpen(false)}>
+                    <Button className="w-full justify-center bg-brand-accent text-white border-none shadow-brand-glow">
                       Get Funded
                     </Button>
                   </Link>

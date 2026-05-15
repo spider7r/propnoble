@@ -59,7 +59,7 @@ export const mapFirmFromDB = (dbFirm: any): PropFirm => {
         website: dbFirm.website || dbFirm.website_url,
         websiteUrl: dbFirm.website_url || dbFirm.website,
         affiliateLink: dbFirm.affiliate_link,
-        discountCode: (dbFirm.discount_code === 'SPOT' ? 'NOBLE' : dbFirm.discount_code) || 'NOBLE',
+        discountCode: (dbFirm.discount_code === 'SPOT' || dbFirm.discount_code === 'PropMatchSpot' ? 'NOBLE' : dbFirm.discount_code) || 'NOBLE',
         logo: dbFirm.logo_url || 'https://placehold.co/400x400/181611/F6AE13?text=No+Logo',
         favicon: dbFirm.favicon || null,
         rating: Number(dbFirm.rating) || 4.5,
@@ -89,6 +89,7 @@ export const mapFirmFromDB = (dbFirm: any): PropFirm => {
         payoutPercentage: dbFirm.payout_percentage || 95,
         last30DaysPayouts: dbFirm.last_30_days_payouts || '$0',
         payoutGrowth: dbFirm.payout_growth || '0%',
+        trading_type: dbFirm.trading_type
     };
 };
 
@@ -110,7 +111,8 @@ const mapChallengeFromDB = (dbChallenge: any): Challenge => {
 
 export const FirmService = {
     // Fetch all ACTIVE firms for Browse Page
-    async getActiveFirms(): Promise<PropFirm[]> {
+    async getActiveFirms(mode?: 'forex' | 'futures'): Promise<PropFirm[]> {
+        // Fetch all active firms first to avoid "missing column" errors in SQL if trading_type isn't added yet
         const { data, error } = await supabase
             .from('firms')
             .select('*, challenges(*)')
@@ -122,7 +124,22 @@ export const FirmService = {
             return [];
         }
 
-        return data.map(mapFirmFromDB);
+        const mappedFirms = data.map(mapFirmFromDB);
+
+        if (!mode) return mappedFirms;
+
+        // Filter in JS for resilience and strict isolation
+        return mappedFirms.filter(firm => {
+            // Explicit trading_type check (highest priority)
+            if (firm.trading_type === 'futures') return mode === 'futures';
+            if (firm.trading_type === 'forex') return mode === 'forex';
+
+            // Fallback for untagged/old data
+            const isFuturesDetected = firm.tags?.some(t => t.toLowerCase() === 'futures') || firm.name.toLowerCase().includes('futures');
+            
+            if (mode === 'futures') return isFuturesDetected;
+            return !isFuturesDetected; // Forex mode shows everything else
+        });
     },
 
     async trackClick(firmId: string, source: string) {

@@ -19,7 +19,7 @@ const FaqItem: React.FC<{ question: string; answer: string }> = ({ question, ans
     )
 }
 
-export default function SpotReplayDashboard() {
+export default function NobleReplayDashboard() {
 
     return (
         <div className="flex flex-col min-h-screen bg-[#181611] overflow-x-hidden font-sans">
@@ -90,7 +90,7 @@ export default function SpotReplayDashboard() {
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-gold opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-gold"></span>
                                 </span>
-                                <span className="text-xs font-semibold text-brand-gold uppercase tracking-wider">Spot Replay Engine Live</span>
+                                <span className="text-xs font-semibold text-brand-gold uppercase tracking-wider">Noble Replay Engine Live</span>
                             </div>
 
                             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[68px] xl:text-[76px] font-black tracking-tight mb-6 leading-[1.05] animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
@@ -393,7 +393,7 @@ export default function SpotReplayDashboard() {
                     <div className="text-center mb-16">
                         <div className="inline-flex items-center gap-2 bg-brand-gold/[0.08] border border-brand-gold/20 rounded-full px-4 py-1.5 mb-5 backdrop-blur-sm">
                             <ShieldCheck className="w-4 h-4 text-brand-gold" />
-                            <span className="text-xs font-bold text-brand-gold uppercase tracking-widest">Why Spot Replay</span>
+                            <span className="text-xs font-bold text-brand-gold uppercase tracking-widest">Why Noble Replay</span>
                         </div>
                         <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight mb-4">
                             <span className="text-gradient-gold">Unfair Advantage</span> Over Competitors
@@ -415,7 +415,7 @@ export default function SpotReplayDashboard() {
                                         <th className="text-left p-5 text-neutral-500 font-bold uppercase text-xs tracking-widest">Feature</th>
                                         <th className="text-center p-5">
                                             <div className="flex flex-col items-center gap-1">
-                                                <span className="text-brand-gold font-black text-lg">Spot Replay</span>
+                                                <span className="text-brand-gold font-black text-lg">Noble Replay</span>
                                                 <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">FREE</span>
                                             </div>
                                         </th>
@@ -479,7 +479,7 @@ export default function SpotReplayDashboard() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-[900px] mx-auto">
 
-                        {/* ── SPOT BASIC (FREE) ── */}
+                        {/* ── NOBLE BASIC (FREE) ── */}
                         <div className="bento-feature relative rounded-[24px] overflow-hidden group">
                             <div className="absolute inset-0 rounded-[24px] bg-gradient-to-b from-white/[0.06] via-white/[0.02] to-white/[0.01]" />
                             <div className="absolute inset-[1px] rounded-[23px] bg-[#0f0e0b]" />
@@ -489,7 +489,7 @@ export default function SpotReplayDashboard() {
                                     <div className="inline-flex items-center gap-2 bg-white/[0.05] border border-white/10 rounded-full px-3 py-1 mb-4">
                                         <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Free Forever</span>
                                     </div>
-                                    <h3 className="text-2xl font-black text-white mb-1">Spot Basic</h3>
+                                    <h3 className="text-2xl font-black text-white mb-1">Noble Basic</h3>
                                     <div className="flex items-baseline gap-1">
                                         <span className="text-4xl font-black text-white">$0</span>
                                         <span className="text-neutral-500 text-sm">/month</span>
@@ -535,7 +535,7 @@ export default function SpotReplayDashboard() {
                             </div>
                         </div>
 
-                        {/* ── SPOT EXCLUSIVE ($39/mo) ── */}
+                        {/* ── NOBLE EXCLUSIVE ($39/mo) ── */}
                         <div className="bento-feature relative rounded-[24px] overflow-hidden group">
                             <div className="absolute inset-0 rounded-[24px] bg-gradient-to-b from-brand-gold/30 via-brand-gold/10 to-brand-gold/5" />
                             <div className="absolute inset-[1px] rounded-[23px] bg-gradient-to-b from-[#1a1508] to-[#0f0e0b]" />
@@ -550,7 +550,7 @@ export default function SpotReplayDashboard() {
                                         <Award className="w-3 h-3 text-brand-gold" />
                                         <span className="text-[10px] font-bold text-brand-gold uppercase tracking-widest">Unlimited Power</span>
                                     </div>
-                                    <h3 className="text-2xl font-black text-brand-gold mb-1">Spot Exclusive</h3>
+                                    <h3 className="text-2xl font-black text-brand-gold mb-1">Noble Exclusive</h3>
                                     <div className="flex items-baseline gap-1">
                                         <span className="text-4xl font-black text-white">$39</span>
                                         <span className="text-neutral-500 text-sm">/month</span>
@@ -586,7 +586,7 @@ export default function SpotReplayDashboard() {
                                 >
                                     <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shine_6s_ease-in-out_infinite]" />
                                     <span className="relative flex items-center gap-2">
-                                        Start Spot Exclusive <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
+                                        Start Noble Exclusive <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
                                     </span>
                                 </a>
                             </div>
@@ -616,7 +616,7 @@ export default function SpotReplayDashboard() {
 
                     <div className="space-y-3 mb-20">
                         <FaqItem
-                            question="Is Spot Replay really free?"
+                            question="Is Noble Replay really free?"
                             answer="Yes! The core backtesting engine is completely free. You can create sessions, replay market data, place trades, and analyze your performance without paying a cent. Premium features like unlimited sessions and advanced analytics are available with an upgrade."
                         />
                         <FaqItem
@@ -633,7 +633,7 @@ export default function SpotReplayDashboard() {
                         />
                         <FaqItem
                             question="Do I need a TradingView subscription?"
-                            answer="No. The TradingView charts are built into Spot Replay — you don't need a separate TradingView account or subscription. All chart features, indicators, and drawing tools are included."
+                            answer="No. The TradingView charts are built into Noble Replay — you don't need a separate TradingView account or subscription. All chart features, indicators, and drawing tools are included."
                         />
                         <FaqItem
                             question="How is my data saved?"
@@ -653,7 +653,7 @@ export default function SpotReplayDashboard() {
                                 Ready to Master the Markets?
                             </h3>
                             <p className="text-brand-muted text-lg max-w-lg mx-auto mb-8">
-                                Join thousands of traders who are sharpening their edge with Spot Replay. No credit card needed.
+                                Join thousands of traders who are sharpening their edge with Noble Replay. No credit card needed.
                             </p>
                             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                                 <a

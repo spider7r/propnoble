@@ -119,7 +119,7 @@ const PayoutNotification: React.FC = () => {
             };
         } else {
             // Discount Logic
-            // Code: SPOT
+            // Code: NOBLE
             // Real Price = challenge.price
             // "Was" Price (implied) = Real Price / 0.8
             // Saved = Was - Real

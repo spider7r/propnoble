@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { FirmService, generateSlug, generateFakeUserForReview } from '../lib/services';
 import { PropFirm } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useModal } from '../context/ModalContext';
+import { useTradeMode } from '../context/TradeModeContext';
 import { Star, Shield, ArrowLeft, MessageSquare, Filter } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -15,6 +16,9 @@ const FirmReviewsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const { showModal } = useModal();
+  const { mode, getModePath } = useTradeMode();
+  const navigate = useNavigate();
+  const location = useLocation();
   
   const [firm, setFirm] = useState<PropFirm | null>(null);
   const [reviews, setReviews] = useState<any[]>([]);
@@ -56,6 +60,19 @@ const FirmReviewsPage: React.FC = () => {
     loadData();
     window.scrollTo(0, 0);
   }, [id]);
+
+  useEffect(() => {
+    if (firm) {
+      const isFuturesFirm = firm.trading_type === 'futures' || firm.tags?.some(t => t.toLowerCase() === 'futures');
+      const isCurrentlyFutures = location.pathname.startsWith('/futures');
+      
+      if (isFuturesFirm && !isCurrentlyFutures) {
+        navigate(`/futures/firm/${id}/reviews`, { replace: true });
+      } else if (!isFuturesFirm && isCurrentlyFutures) {
+        navigate(`/firm/${id}/reviews`, { replace: true });
+      }
+    }
+  }, [firm, location.pathname, navigate, id]);
 
   const submitReview = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,7 +162,7 @@ const FirmReviewsPage: React.FC = () => {
       <div className="min-h-screen bg-brand-black flex items-center justify-center text-white pt-20">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">Firm Not Found</h2>
-          <Link to="/firms"><Button>Back to Browse</Button></Link>
+          <Link to={getModePath('/firms')}><Button>Back to Browse</Button></Link>
         </div>
       </div>
     );
@@ -158,11 +175,11 @@ const FirmReviewsPage: React.FC = () => {
         
         {/* Breadcrumb & Navigation */}
         <div className="flex items-center gap-4 border-b border-brand-border/50 pb-6">
-            <Link to={`/firm/${generateSlug(firm.name)}`} className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-brand-charcoal border border-brand-border text-brand-muted hover:text-white hover:border-brand-gold/50 transition-all">
+            <Link to={getModePath(`/firm/${generateSlug(firm.name)}`)} className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-brand-charcoal border border-brand-border text-brand-muted hover:text-white hover:border-brand-gold/50 transition-all">
                 <ArrowLeft size={18} />
             </Link>
             <div>
-                <Link to={`/firm/${generateSlug(firm.name)}`} className="text-brand-gold text-sm font-bold hover:underline mb-1 block">
+                <Link to={getModePath(`/firm/${generateSlug(firm.name)}`)} className="text-brand-gold text-sm font-bold hover:underline mb-1 block">
                     Back to Firm Profile
                 </Link>
                 <h1 className="text-3xl text-white font-black leading-tight flex items-center gap-3">

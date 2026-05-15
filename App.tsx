@@ -1,5 +1,5 @@
 import React from 'react';
-import { HashRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import LandingPage from './pages/LandingPage';
 import Footer from './components/Footer';
@@ -19,8 +19,8 @@ import ContactUsPage from './pages/ContactUsPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import RiskDisclosurePage from './pages/RiskDisclosurePage';
-import SpotAIPage from './pages/SpotAIPage';
-import SpotReplayDashboard from './pages/SpotReplayDashboard';
+import NobleAIPage from './pages/NobleAIPage';
+import NobleReplayDashboard from './pages/NobleReplayDashboard';
 import ReplaySessionPage from './pages/ReplaySessionPage';
 import AdminLayout from './components/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -80,10 +80,10 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; role?: 'admin' | 'us
 // Main Layout Component (Requires Router Context)
 const MainLayout = () => {
   const location = useLocation();
-  const isOffersPage = location.pathname === '/offers';
-  const isAdminPage = location.pathname.startsWith('/admin');
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
-  const isReplaySessionPage = location.pathname.startsWith('/session/');
+  const isOffersPage = location.pathname.endsWith('/offers');
+  const isAdminPage = location.pathname.includes('/admin');
+  const isAuthPage = location.pathname.includes('/login') || location.pathname.includes('/signup');
+  const isReplaySessionPage = location.pathname.includes('/session/');
 
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col font-sans text-white selection:bg-brand-500 selection:text-white">
@@ -110,8 +110,8 @@ const MainLayout = () => {
           <Route path="/terms" element={<TermsOfServicePage />} />
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
           <Route path="/risk" element={<RiskDisclosurePage />} />
-          <Route path="/spot-ai" element={<SpotAIPage />} />
-          <Route path="/spot-replay" element={<SpotReplayDashboard />} />
+          <Route path="/noble-ai" element={<NobleAIPage />} />
+          <Route path="/noble-replay" element={<NobleReplayDashboard />} />
           <Route path="/session/:sessionId" element={<ReplaySessionPage />} />
 
           {/* Auth Routes */}
@@ -161,19 +161,28 @@ const MainLayout = () => {
     </div>
   );
 };
+import { TradeModeProvider } from './context/TradeModeContext';
 
 function App() {
   return (
-    <HashRouter>
+    <BrowserRouter>
       <AuthProvider>
         <ModalProvider>
           <ComparisonProvider>
-            <MainLayout />
-            <GlobalModal />
+            <TradeModeProvider>
+              <Routes>
+                {/* Futures prefixed routes */}
+                <Route path="/futures/*" element={<MainLayout />} />
+                
+                {/* Default (Forex) routes */}
+                <Route path="/*" element={<MainLayout />} />
+              </Routes>
+              <GlobalModal />
+            </TradeModeProvider>
           </ComparisonProvider>
         </ModalProvider>
       </AuthProvider>
-    </HashRouter>
+    </BrowserRouter>
   );
 }
 

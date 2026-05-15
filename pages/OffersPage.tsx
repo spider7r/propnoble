@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabaseClient';
 import { useModal } from '../context/ModalContext';
+import { useTradeMode } from '../context/TradeModeContext';
 import { Loader2, Ticket, CheckCircle2, Copy, ExternalLink, Timer, Zap, ShieldCheck } from 'lucide-react';
 
 interface Offer {
@@ -22,28 +23,48 @@ interface Offer {
 }
 
 const OffersPage: React.FC = () => {
+  const { mode } = useTradeMode();
   const { user } = useAuth();
   const { showModal } = useModal();
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const isFutures = mode === 'futures';
 
   useEffect(() => {
     fetchOffers();
-  }, []);
+  }, [mode]);
 
   const fetchOffers = async () => {
     setLoading(true);
     try {
       const { data, error } = await supabase
         .from('offers')
-        .select('*, firms(name, logo_url, website, affiliate_link)')
+        .select('*, firms(name, logo_url, website, affiliate_link, trading_type, tags)')
         .eq('status', 'active')
         .order('verified', { ascending: false })
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setOffers(data || []);
+      
+      const allOffers = data || [];
+
+      // Filter in JS for resilience and strict isolation
+      const filtered = allOffers.filter(offer => {
+        const firm = (offer.firms as any);
+        
+        // Strict check: if trading_type is set, respect it exactly
+        if (firm?.trading_type === 'futures') return isFutures;
+        if (firm?.trading_type === 'forex') return !isFutures;
+
+        // Fallback for old/untyped data
+        const isFuturesFirm = firm?.tags?.some((t: string) => t.toLowerCase() === 'futures') || firm?.name?.toLowerCase().includes('futures');
+
+        if (isFutures) return isFuturesFirm;
+        return !isFuturesFirm;
+      });
+
+      setOffers(filtered);
     } catch (err) {
       console.error('Error loading offers:', err);
     } finally {
@@ -62,8 +83,8 @@ const OffersPage: React.FC = () => {
     <div className="pt-36 pb-24 min-h-screen bg-black relative overflow-hidden">
       {/* Background Ambience */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-5%] right-[-5%] w-[40%] h-[40%] bg-brand-primary/10 rounded-full blur-[120px] animate-aurora"></div>
-        <div className="absolute bottom-[10%] left-[-5%] w-[30%] h-[30%] bg-brand-primary/5 rounded-full blur-[120px] animate-aurora-reverse"></div>
+        <div className="absolute top-[-5%] right-[-5%] w-[40%] h-[40%] bg-brand-accent/10 rounded-full blur-[120px] animate-aurora"></div>
+        <div className="absolute bottom-[10%] left-[-5%] w-[30%] h-[30%] bg-brand-accent/5 rounded-full blur-[120px] animate-aurora-reverse"></div>
         <div className="absolute inset-0 bg-grid-white opacity-[0.02]"></div>
       </div>
 
@@ -71,11 +92,11 @@ const OffersPage: React.FC = () => {
         {/* Hero Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-primary/10 border border-brand-primary/20 text-brand-primary text-[10px] font-black uppercase tracking-widest mb-6 animate-fade-in-up">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-accent/10 border border-brand-accent/20 text-brand-accent text-[10px] font-black uppercase tracking-widest mb-6 animate-fade-in-up">
               <Zap size={14} /> VIP Trading Benefits
             </div>
             <h1 className="text-5xl md:text-6xl font-black text-white mb-6 tracking-tight uppercase animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-              Exclusive <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary via-red-500 to-amber-500">Deals</span>
+              Exclusive <span className="text-brand-accent">{isFutures ? 'Futures' : 'Prop'} Deals</span>
             </h1>
             <p className="text-brand-muted text-lg font-medium leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
               Unlock massive savings on the world's most reputable prop firms. 
@@ -84,26 +105,26 @@ const OffersPage: React.FC = () => {
           </div>
           
           <div className="bg-[#0a0a0a] border border-[#1f1f1f] p-6 rounded-3xl flex flex-col items-center gap-2 shadow-2xl animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-             <div className="flex items-center gap-2 text-brand-primary">
+             <div className="flex items-center gap-2 text-brand-accent">
                 <ShieldCheck size={20} />
                 <span className="text-xl font-black">{offers.filter(o => o.verified).length}</span>
              </div>
-             <span className="text-[10px] font-black uppercase tracking-widest text-neutral-500 text-center">Verified Offers<br/>Available Today</span>
+             <span className="text-[10px] font-black uppercase tracking-widest text-neutral-500 text-center">Verified {isFutures ? 'Futures' : 'Prop'} Offers<br/>Available Today</span>
           </div>
         </div>
 
         {/* Featured Deal Spotlight */}
         <div className="mb-16 relative group animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-primary/20 via-transparent to-brand-primary/10 blur-[50px] opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+          <div className="absolute inset-0 bg-brand-accent/20 blur-[50px] opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
           <div className="relative rounded-[40px] border border-white/5 bg-gradient-to-br from-[#0d0d0d] to-[#050505] p-8 md:p-12 overflow-hidden shadow-2xl">
             {/* Animated background elements */}
-            <div className="absolute -right-20 -top-20 w-80 h-80 bg-brand-primary/20 rounded-full blur-[100px] animate-pulse-slow"></div>
+            <div className="absolute -right-20 -top-20 w-80 h-80 bg-brand-accent/20 rounded-full blur-[100px] animate-pulse-slow"></div>
             <div className="absolute inset-0 bg-grid-white opacity-[0.03]"></div>
 
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-12 relative z-10">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-6">
-                  <span className="px-4 py-1 rounded-full bg-brand-primary text-white text-[10px] font-black uppercase tracking-widest animate-shine relative overflow-hidden">
+                  <span className="px-4 py-1 rounded-full bg-brand-accent text-black text-[10px] font-black uppercase tracking-widest animate-shine relative overflow-hidden">
                     Deal of the Month
                   </span>
                   <span className="text-amber-500 text-sm font-bold flex items-center gap-1.5 uppercase tracking-wider">
@@ -112,13 +133,13 @@ const OffersPage: React.FC = () => {
                 </div>
                 <h2 className="text-4xl md:text-6xl font-black text-white leading-tight mb-6">
                   SUPERCHARGE YOUR <br/>
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-amber-500">TRADING JOURNEY</span>
+                  <span className="text-brand-accent">TRADING JOURNEY</span>
                 </h2>
-                <p className="text-brand-muted text-xl font-medium max-w-xl mb-8">
+                <p className="text-neutral-400 text-xl font-medium max-w-xl mb-8">
                   Get up to 30% discount on all challenge phases this week only. Use code <span className="text-white font-black">NOBLE</span> for maximum benefit.
                 </p>
                 <div className="flex flex-wrap gap-4">
-                  <button className="px-10 py-4 rounded-2xl bg-white text-black font-black text-sm uppercase tracking-widest hover:bg-brand-primary hover:text-white transition-all duration-300 shadow-xl active:scale-[0.98]">
+                  <button className="px-10 py-4 rounded-2xl bg-white text-black font-black text-sm uppercase tracking-widest hover:bg-brand-accent hover:text-white transition-all duration-300 shadow-xl active:scale-[0.98]">
                     Browse All Rewards
                   </button>
                 </div>
@@ -126,8 +147,8 @@ const OffersPage: React.FC = () => {
               
               {/* Graphic Element */}
               <div className="hidden lg:flex items-center justify-center relative w-64 h-64">
-                <div className="absolute inset-0 bg-brand-primary/30 rounded-full blur-3xl animate-breathing-glow"></div>
-                <Ticket size={160} className="text-brand-primary transform -rotate-12 drop-shadow-[0_0_30px_rgba(255,0,0,0.5)] animate-float" />
+                <div className="absolute inset-0 bg-brand-accent/30 rounded-full blur-3xl animate-breathing-glow"></div>
+                <Ticket size={160} className="text-brand-accent transform -rotate-12 drop-shadow-brand-glow animate-float" />
               </div>
             </div>
           </div>
@@ -135,7 +156,7 @@ const OffersPage: React.FC = () => {
 
         {/* Filters / Categories */}
         <div className="flex items-center gap-4 mb-12 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
-          <button className="px-6 py-2.5 rounded-xl bg-brand-primary text-white text-xs font-black uppercase tracking-widest shadow-[0_0_20px_rgba(255,0,0,0.2)]">
+          <button className="px-6 py-2.5 rounded-xl bg-brand-accent text-black text-xs font-black uppercase tracking-widest shadow-brand-glow">
             All Offers
           </button>
           <button className="px-6 py-2.5 rounded-xl bg-[#0a0a0a] border border-[#1f1f1f] text-neutral-500 text-xs font-black uppercase tracking-widest hover:text-white hover:border-white/20 transition-all">
@@ -149,19 +170,19 @@ const OffersPage: React.FC = () => {
         {/* Offer Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {loading ? (
-            <div className="col-span-full flex flex-col items-center justify-center py-32 text-brand-muted gap-6 animate-fade-in-up">
-              <div className="w-12 h-12 border-4 border-brand-primary/20 border-t-brand-primary rounded-full animate-spin"></div>
+            <div className="col-span-full flex flex-col items-center justify-center py-32 text-neutral-500 gap-6 animate-fade-in-up">
+              <div className="w-12 h-12 border-4 border-brand-accent/20 border-t-brand-accent rounded-full animate-spin"></div>
               <p className="font-black uppercase tracking-widest text-xs">Accessing Market Deals...</p>
             </div>
           ) : offers.length > 0 ? (
             offers.map((offer, idx) => (
               <div 
                 key={offer.id} 
-                className="group relative flex flex-col bg-[#0a0a0a] border border-[#1f1f1f] rounded-[32px] p-8 transition-all duration-500 hover:border-brand-primary/40 hover:shadow-[0_20px_60px_rgba(0,0,0,0.6)] animate-fade-in-up"
+                className="group relative flex flex-col bg-[#0a0a0a] border border-[#1f1f1f] rounded-[32px] p-8 transition-all duration-500 hover:border-brand-accent/40 hover:shadow-[0_20px_60px_rgba(0,0,0,0.6)] animate-fade-in-up"
                 style={{ animationDelay: `${0.6 + idx * 0.1}s` }}
               >
                 {/* Visual Accent */}
-                <div className="absolute top-0 right-10 w-20 h-px bg-gradient-to-r from-transparent via-brand-primary to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute top-0 right-10 w-20 h-px bg-gradient-to-r from-transparent via-brand-accent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
                 <div className="flex justify-between items-start mb-8">
                   <div className="flex items-center gap-4">
@@ -169,13 +190,13 @@ const OffersPage: React.FC = () => {
                       {offer.firms?.logo_url ? (
                         <img src={offer.firms.logo_url} alt={offer.firms.name} className="w-full h-full object-contain" />
                       ) : (
-                        <div className="font-black text-brand-primary text-xl">{offer.firms?.name?.substring(0, 1)}</div>
+                        <div className="font-black text-brand-accent text-xl">{offer.firms?.name?.substring(0, 1)}</div>
                       )}
                     </div>
                     <div>
                       <h4 className="text-white font-black text-lg tracking-tight leading-tight uppercase">{offer.firms?.name || 'Unknown Firm'}</h4>
                       <div className="flex items-center gap-1.5 mt-1">
-                        <CheckCircle2 size={12} className="text-brand-primary" />
+                        <CheckCircle2 size={12} className="text-brand-accent" />
                         <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest">Authorized Partner</span>
                       </div>
                     </div>
@@ -189,7 +210,7 @@ const OffersPage: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col gap-2 mb-8">
-                  <div className="text-5xl font-black text-white tracking-tighter group-hover:text-brand-primary transition-colors duration-500 uppercase">
+                  <div className="text-5xl font-black text-white tracking-tighter group-hover:text-brand-accent transition-colors duration-500 uppercase">
                     {offer.discount || 'PROMO'}
                   </div>
                   <p className="text-neutral-400 font-medium text-sm leading-relaxed">{offer.title}</p>
@@ -211,7 +232,7 @@ const OffersPage: React.FC = () => {
                       href={offer.firms?.affiliate_link || offer.firms?.website || '#'}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex-1 h-12 flex items-center justify-center rounded-xl bg-white text-black font-black text-xs uppercase tracking-widest hover:bg-brand-primary hover:text-white transition-all duration-300 shadow-lg active:scale-[0.95]"
+                      className="flex-1 h-12 flex items-center justify-center rounded-xl bg-white text-black font-black text-xs uppercase tracking-widest hover:bg-brand-accent hover:text-white transition-all duration-300 shadow-lg active:scale-[0.95]"
                     >
                       Activate <ExternalLink size={14} className="ml-1.5" />
                     </a>

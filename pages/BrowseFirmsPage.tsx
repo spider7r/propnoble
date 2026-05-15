@@ -3,17 +3,23 @@ import { Search } from 'lucide-react';
 import FirmCard from '../components/FirmCard';
 import { FirmService } from '../lib/services';
 import { PropFirm } from '../types';
+import { useTradeMode } from '../context/TradeModeContext';
 
 const BrowseFirmsPage: React.FC = () => {
+  const { mode } = useTradeMode();
   const [firms, setFirms] = useState<PropFirm[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const isFutures = mode === 'futures';
 
   // Fetch Real Data
   useEffect(() => {
     const fetchFirms = async () => {
       try {
-        const data = await FirmService.getActiveFirms();
+        setLoading(true);
+        // We'll use the same service but filter logic here for simplicity 
+        // or update getActiveFirms to handle mode if possible.
+        const data = await FirmService.getActiveFirms(mode);
         setFirms(data);
       } catch (err) {
         console.error('Failed to load firms', err);
@@ -22,7 +28,7 @@ const BrowseFirmsPage: React.FC = () => {
       }
     };
     fetchFirms();
-  }, []);
+  }, [mode]);
 
   // Filter States
   const [profitSplit, setProfitSplit] = useState(80);
@@ -52,7 +58,7 @@ const BrowseFirmsPage: React.FC = () => {
     });
 
     return {
-      dynamicTitle: `Top Prop Trading Firms ${monthName} ${year}`,
+      dynamicTitle: `Top ${isFutures ? 'Futures' : 'Forex'} Firms ${monthName} ${year}`,
       todayDate: formattedToday
     };
   }, []);
@@ -100,7 +106,7 @@ const BrowseFirmsPage: React.FC = () => {
 
         {loading && (
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-gold"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-accent"></div>
           </div>
         )}
 
@@ -111,10 +117,10 @@ const BrowseFirmsPage: React.FC = () => {
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div className="max-w-2xl">
                   <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-3">{dynamicTitle}</h1>
-                  <p className="text-brand-muted text-lg">Compare, review, and discover the world's leading proprietary trading firms designed for professional traders.</p>
+                  <p className="text-neutral-400 text-lg">Compare, review, and discover the world's leading {isFutures ? 'futures' : 'proprietary'} trading firms designed for professional traders.</p>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-brand-muted">
-                  <span className="material-symbols-outlined text-brand-gold text-[18px]">verified</span>
+                <div className="flex items-center gap-2 text-sm text-neutral-400">
+                  <span className="material-symbols-outlined text-brand-accent text-[18px]">verified</span>
                   <span>Updated: {todayDate}</span>
                 </div>
               </div>
@@ -130,7 +136,7 @@ const BrowseFirmsPage: React.FC = () => {
                   </h3>
                   <button
                     onClick={() => { setSearchTerm(''); setProfitSplit(80); setMaxDrawdown(10); setMinRating(4); setSelectedAccountType(null); }}
-                    className="text-xs font-medium text-brand-gold hover:text-white transition-colors"
+                    className="text-xs font-medium text-brand-accent hover:text-white transition-colors"
                   >
                     Reset All
                   </button>
@@ -145,8 +151,8 @@ const BrowseFirmsPage: React.FC = () => {
                         key={type}
                         onClick={() => setSelectedAccountType(selectedAccountType === type ? null : type)}
                         className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${selectedAccountType === type
-                          ? 'bg-brand-gold text-brand-black border-brand-gold shadow-[0_0_10px_rgba(246,174,19,0.3)]'
-                          : 'bg-brand-charcoal text-brand-muted border-brand-border hover:border-brand-gold/50 hover:text-white'
+                          ? 'bg-brand-accent text-black border-brand-accent shadow-brand-glow'
+                          : 'bg-[#111] text-neutral-400 border-[#222] hover:border-brand-accent/50 hover:text-white'
                           }`}
                       >
                         {type}
@@ -175,8 +181,8 @@ const BrowseFirmsPage: React.FC = () => {
                 {/* Filter Group: Profit Split */}
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <label className="text-sm font-medium text-brand-muted uppercase tracking-wider">Profit Split</label>
-                    <span className="text-xs text-brand-gold font-bold">Up to {profitSplit}%</span>
+                    <label className="text-sm font-medium text-neutral-400 uppercase tracking-wider">Profit Split</label>
+                    <span className="text-xs text-brand-accent font-bold">Up to {profitSplit}%</span>
                   </div>
                   <div className="px-1">
                     <input
@@ -209,7 +215,7 @@ const BrowseFirmsPage: React.FC = () => {
                       onChange={(e) => setMaxDrawdown(Number(e.target.value))}
                       className="w-full h-2 bg-brand-border rounded-lg appearance-none cursor-pointer"
                     />
-                    <div className="flex justify-between mt-2 text-xs text-brand-muted">
+                    <div className="flex justify-between mt-2 text-xs text-neutral-500">
                       <span>5%</span>
                       <span>20%</span>
                     </div>
@@ -225,9 +231,9 @@ const BrowseFirmsPage: React.FC = () => {
                         <input
                           type="checkbox"
                           defaultChecked={['Indices'].includes(asset)}
-                          className="size-4 rounded border-brand-border bg-brand-charcoal text-brand-gold focus:ring-offset-brand-black focus:ring-brand-gold checked:bg-brand-gold checked:border-brand-gold appearance-none border"
+                          className="size-4 rounded border-[#222] bg-[#111] text-brand-accent focus:ring-offset-black focus:ring-brand-accent checked:bg-brand-accent checked:border-brand-accent appearance-none border"
                         />
-                        <span className="text-sm text-gray-300 group-hover:text-white transition-colors">{asset}</span>
+                        <span className="text-sm text-neutral-400 group-hover:text-white transition-colors">{asset}</span>
                       </label>
                     ))}
                   </div>
@@ -246,27 +252,27 @@ const BrowseFirmsPage: React.FC = () => {
                           onChange={() => setMinRating(rating)}
                           className="size-4 border-brand-border bg-brand-charcoal text-brand-gold focus:ring-offset-brand-black focus:ring-brand-gold appearance-none border rounded-full checked:bg-brand-gold"
                         />
-                        <div className="flex text-brand-gold text-[16px]">
+                        <div className="flex text-brand-accent text-[16px]">
                           {[1, 2, 3, 4, 5].map(s => (
-                            <span key={s} className={`material-symbols-outlined ${s <= rating ? 'fill-current' : 'text-brand-border'}`}>
+                            <span key={s} className={`material-symbols-outlined ${s <= rating ? 'fill-current' : 'text-[#222]'}`}>
                               star
                             </span>
                           ))}
                         </div>
-                        <span className="text-sm text-brand-muted group-hover:text-white">& Up</span>
+                        <span className="text-sm text-neutral-500 group-hover:text-white">& Up</span>
                       </label>
                     ))}
                   </div>
                 </div>
 
                 {/* CTA Block */}
-                <div className="p-4 rounded-xl bg-gradient-to-br from-brand-charcoal to-[#2a251a] border border-brand-border/50 text-center space-y-3">
-                  <div className="size-10 rounded-full bg-brand-gold/20 flex items-center justify-center mx-auto text-brand-gold">
+                <div className="p-4 rounded-xl bg-gradient-to-br from-[#111] to-[#1a1a1a] border border-white/5 text-center space-y-3">
+                  <div className="size-10 rounded-full bg-brand-accent/20 flex items-center justify-center mx-auto text-brand-accent">
                     <span className="material-symbols-outlined">mark_email_unread</span>
                   </div>
                   <h4 className="text-white font-bold text-sm">Get New Deals</h4>
-                  <p className="text-xs text-brand-muted">Join 15,000+ traders getting weekly prop firm discounts.</p>
-                  <button className="w-full py-2 text-xs font-bold uppercase tracking-wider text-brand-black bg-white rounded hover:bg-gray-200 transition-colors">Subscribe</button>
+                  <p className="text-xs text-neutral-500">Join 15,000+ traders getting weekly prop firm discounts.</p>
+                  <button className="w-full py-2 text-xs font-bold uppercase tracking-wider text-black bg-white rounded hover:bg-gray-200 transition-colors">Subscribe</button>
                 </div>
               </aside>
 
@@ -274,9 +280,9 @@ const BrowseFirmsPage: React.FC = () => {
               <div className="flex-1 flex flex-col min-w-0">
 
                 {/* Controls Bar */}
-                <div className="flex flex-wrap items-center justify-between gap-4 mb-6 bg-brand-charcoal/50 p-3 rounded-xl border border-brand-border">
+                <div className="flex flex-wrap items-center justify-between gap-4 mb-6 bg-[#111]/50 p-3 rounded-xl border border-white/5">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-brand-muted">Showing <span className="text-white font-bold">{filteredFirms.length}</span> Firms</span>
+                    <span className="text-sm text-neutral-400">Showing <span className="text-white font-bold">{filteredFirms.length}</span> Firms</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
@@ -288,11 +294,11 @@ const BrowseFirmsPage: React.FC = () => {
                         <option>Max Funding</option>
                       </select>
                     </div>
-                    <div className="h-6 w-px bg-brand-border mx-1"></div>
-                    <button className="p-2 text-brand-gold hover:bg-white/5 rounded-lg transition-colors">
+                    <div className="h-6 w-px bg-white/5 mx-1"></div>
+                    <button className="p-2 text-brand-accent hover:bg-white/5 rounded-lg transition-colors">
                       <span className="material-symbols-outlined text-[20px]">grid_view</span>
                     </button>
-                    <button className="p-2 text-brand-muted hover:bg-white/5 rounded-lg transition-colors">
+                    <button className="p-2 text-neutral-500 hover:bg-white/5 rounded-lg transition-colors">
                       <span className="material-symbols-outlined text-[20px]">view_list</span>
                     </button>
                   </div>
@@ -308,15 +314,15 @@ const BrowseFirmsPage: React.FC = () => {
                 {/* Pagination */}
                 <div className="mt-12 flex justify-center">
                   <div className="flex items-center justify-center p-4 gap-2">
-                    <a className="flex size-10 items-center justify-center rounded-lg hover:bg-brand-charcoal transition-colors cursor-pointer">
+                    <a className="flex size-10 items-center justify-center rounded-lg hover:bg-[#111] transition-colors cursor-pointer">
                       <span className="material-symbols-outlined text-white text-[18px]">chevron_left</span>
                     </a>
-                    <a className="text-sm font-bold flex size-10 items-center justify-center text-brand-black rounded-lg bg-brand-gold cursor-pointer">1</a>
-                    <a className="text-sm font-medium flex size-10 items-center justify-center text-brand-muted hover:text-white hover:bg-brand-charcoal rounded-lg transition-colors cursor-pointer">2</a>
-                    <a className="text-sm font-medium flex size-10 items-center justify-center text-brand-muted hover:text-white hover:bg-brand-charcoal rounded-lg transition-colors cursor-pointer">3</a>
-                    <span className="flex size-10 items-center justify-center text-brand-muted">...</span>
-                    <a className="text-sm font-medium flex size-10 items-center justify-center text-brand-muted hover:text-white hover:bg-brand-charcoal rounded-lg transition-colors cursor-pointer">8</a>
-                    <a className="flex size-10 items-center justify-center rounded-lg hover:bg-brand-charcoal transition-colors cursor-pointer">
+                    <a className="text-sm font-bold flex size-10 items-center justify-center text-black rounded-lg bg-brand-accent cursor-pointer">1</a>
+                    <a className="text-sm font-medium flex size-10 items-center justify-center text-neutral-400 hover:text-white hover:bg-[#111] rounded-lg transition-colors cursor-pointer">2</a>
+                    <a className="text-sm font-medium flex size-10 items-center justify-center text-neutral-400 hover:text-white hover:bg-[#111] rounded-lg transition-colors cursor-pointer">3</a>
+                    <span className="flex size-10 items-center justify-center text-neutral-500">...</span>
+                    <a className="text-sm font-medium flex size-10 items-center justify-center text-neutral-400 hover:text-white hover:bg-[#111] rounded-lg transition-colors cursor-pointer">8</a>
+                    <a className="flex size-10 items-center justify-center rounded-lg hover:bg-[#111] transition-colors cursor-pointer">
                       <span className="material-symbols-outlined text-white text-[18px]">chevron_right</span>
                     </a>
                   </div>
