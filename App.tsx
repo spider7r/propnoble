@@ -14,6 +14,7 @@ import OffersPage from './pages/OffersPage';
 import UserDashboard from './pages/UserDashboard';
 import CompetitionsPage from './pages/CompetitionsPage';
 import CompetitionDetailPage from './pages/CompetitionDetailPage';
+import PropFirmRulesPage from './pages/PropFirmRulesPage';
 import AboutUsPage from './pages/AboutUsPage';
 import ContactUsPage from './pages/ContactUsPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
@@ -103,6 +104,7 @@ const MainLayout = () => {
           <Route path="/competitions" element={<CompetitionsPage />} />
           <Route path="/competition/:id" element={<CompetitionDetailPage />} />
           <Route path="/offers" element={<OffersPage />} />
+          <Route path="/rules" element={<PropFirmRulesPage />} />
 
           {/* Info Pages */}
           <Route path="/about" element={<AboutUsPage />} />
@@ -171,10 +173,13 @@ function App() {
           <ComparisonProvider>
             <TradeModeProvider>
               <Routes>
-                {/* Futures prefixed routes */}
-                <Route path="/futures/*" element={<MainLayout />} />
+                {/* Forex prefixed routes */}
+                <Route path="/forex/*" element={<MainLayout />} />
+
+                {/* Crypto prefixed routes */}
+                <Route path="/crypto/*" element={<MainLayout />} />
                 
-                {/* Default (Forex) routes */}
+                {/* Default (Futures) routes */}
                 <Route path="/*" element={<MainLayout />} />
               </Routes>
               <GlobalModal />

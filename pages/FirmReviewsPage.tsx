@@ -64,12 +64,16 @@ const FirmReviewsPage: React.FC = () => {
   useEffect(() => {
     if (firm) {
       const isFuturesFirm = firm.trading_type === 'futures' || firm.tags?.some(t => t.toLowerCase() === 'futures');
-      const isCurrentlyFutures = location.pathname.startsWith('/futures');
+      const isCryptoFirm = firm.trading_type === 'crypto' || firm.tags?.some(t => t.toLowerCase() === 'crypto');
+      const firmMode = isCryptoFirm ? 'crypto' : isFuturesFirm ? 'futures' : 'forex';
       
-      if (isFuturesFirm && !isCurrentlyFutures) {
-        navigate(`/futures/firm/${id}/reviews`, { replace: true });
-      } else if (!isFuturesFirm && isCurrentlyFutures) {
-        navigate(`/firm/${id}/reviews`, { replace: true });
+      const isForexRoute = location.pathname.startsWith('/forex');
+      const isCryptoRoute = location.pathname.startsWith('/crypto');
+      const currentRouteMode = isForexRoute ? 'forex' : isCryptoRoute ? 'crypto' : 'futures';
+      
+      if (firmMode !== currentRouteMode) {
+        const prefix = firmMode === 'futures' ? '' : `/${firmMode}`;
+        navigate(`${prefix}/firm/${id}/reviews`, { replace: true });
       }
     }
   }, [firm, location.pathname, navigate, id]);

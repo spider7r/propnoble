@@ -24,7 +24,7 @@ const CompetitionsPage = () => {
     const [competitions, setCompetitions] = useState<Competition[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<'all' | 'active' | 'upcoming'>('all');
-    const isFutures = mode === 'futures';
+    const modeLabel = mode === 'futures' ? 'Futures' : mode === 'crypto' ? 'Crypto' : 'Trading';
 
     useEffect(() => {
         fetchCompetitions();
@@ -44,11 +44,12 @@ const CompetitionsPage = () => {
             // Filter by mode
             const filtered = (data || []).filter(comp => {
                 const firm = (comp.firms as any);
-                if (isFutures) {
-                    return firm?.trading_type === 'futures' || firm?.tags?.some((t: string) => t.toLowerCase() === 'futures');
-                } else {
-                    return firm?.trading_type !== 'futures' && !firm?.tags?.some((t: string) => t.toLowerCase() === 'futures');
-                }
+                if (firm?.trading_type) return firm.trading_type === mode;
+                const isFuturesFirm = firm?.tags?.some((t: string) => t.toLowerCase() === 'futures');
+                const isCryptoFirm = firm?.tags?.some((t: string) => t.toLowerCase() === 'crypto');
+                if (mode === 'futures') return isFuturesFirm;
+                if (mode === 'crypto') return isCryptoFirm;
+                return !isFuturesFirm && !isCryptoFirm;
             });
 
             setCompetitions(filtered);
@@ -91,7 +92,7 @@ const CompetitionsPage = () => {
                         <Trophy size={14} /> Elite Trading Events
                     </div>
                     <h1 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tight uppercase animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                        {isFutures ? 'Futures' : 'Trading'} <span className="text-brand-accent">Competitions</span>
+                        {modeLabel} <span className="text-brand-accent">Competitions</span>
                     </h1>
                     <p className="text-brand-muted text-lg md:text-xl max-w-3xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
                         Join the arena where the world's best traders compete for glory and massive capital. 

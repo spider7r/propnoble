@@ -86,13 +86,21 @@ const FirmDetailPage: React.FC = () => {
 
   useEffect(() => {
     if (firm) {
+      // Determine the firm's actual mode
       const isFuturesFirm = firm.trading_type === 'futures' || firm.tags?.some(t => t.toLowerCase() === 'futures');
-      const isCurrentlyFutures = location.pathname.startsWith('/futures');
+      const isCryptoFirm = firm.trading_type === 'crypto' || firm.tags?.some(t => t.toLowerCase() === 'crypto');
       
-      if (isFuturesFirm && !isCurrentlyFutures) {
-        navigate(`/futures/firm/${id}`, { replace: true });
-      } else if (!isFuturesFirm && isCurrentlyFutures) {
-        navigate(`/firm/${id}`, { replace: true });
+      const firmMode = isCryptoFirm ? 'crypto' : isFuturesFirm ? 'futures' : 'forex';
+      
+      // Determine current URL mode
+      const isForexRoute = location.pathname.startsWith('/forex');
+      const isCryptoRoute = location.pathname.startsWith('/crypto');
+      const currentRouteMode = isForexRoute ? 'forex' : isCryptoRoute ? 'crypto' : 'futures';
+      
+      // Redirect if mismatch
+      if (firmMode !== currentRouteMode) {
+        const prefix = firmMode === 'futures' ? '' : `/${firmMode}`;
+        navigate(`${prefix}/firm/${id}`, { replace: true });
       }
     }
   }, [firm, location.pathname, navigate, id]);
@@ -135,11 +143,14 @@ const FirmDetailPage: React.FC = () => {
         if (data && !error) {
           const allSimilar = data.map(mapFirmFromDB);
           const filtered = allSimilar.filter(f => {
-            if (firm.trading_type === 'futures') {
-                return f.trading_type === 'futures' || f.tags?.some(t => t.toLowerCase() === 'futures');
-            } else {
-                return f.trading_type !== 'futures' && !f.tags?.some(t => t.toLowerCase() === 'futures');
-            }
+            if (firm.trading_type) return f.trading_type === firm.trading_type;
+            const isFutures = f.trading_type === 'futures' || f.tags?.some(t => t.toLowerCase() === 'futures');
+            const isCrypto = f.trading_type === 'crypto' || f.tags?.some(t => t.toLowerCase() === 'crypto');
+            const firmIsFutures = firm.tags?.some(t => t.toLowerCase() === 'futures');
+            const firmIsCrypto = firm.tags?.some(t => t.toLowerCase() === 'crypto');
+            if (firmIsFutures) return isFutures;
+            if (firmIsCrypto) return isCrypto;
+            return !isFutures && !isCrypto;
           }).slice(0, 3);
           
           setSimilarFirms(filtered);

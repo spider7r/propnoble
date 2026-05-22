@@ -33,7 +33,7 @@ const LandingPage: React.FC = () => {
   const [offersPage, setOffersPage] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [copiedFirm, setCopiedFirm] = useState<{name: string; logo: string; rating: number; code: string; discount: string; website: string; affiliate: string} | null>(null);
-  const isFutures = mode === 'futures';
+  const modeLabel = mode === 'futures' ? 'Futures' : mode === 'crypto' ? 'Crypto' : 'Prop';
 
   // Detect mobile for pagination page size
   useEffect(() => {
@@ -107,7 +107,10 @@ const LandingPage: React.FC = () => {
     const filtered = TICKER_LOGOS.filter(firm => {
       const name = firm.name.toLowerCase();
       const isFutures = name.includes('ats') || name.includes('futures');
-      return mode === 'futures' ? isFutures : !isFutures;
+      const isCrypto = name.includes('crypto');
+      if (mode === 'futures') return isFutures;
+      if (mode === 'crypto') return isCrypto;
+      return !isFutures && !isCrypto;
     });
     return [...filtered, ...filtered, ...filtered];
   }, [mode]);
@@ -185,11 +188,11 @@ const LandingPage: React.FC = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 w-full text-center mt-6 lg:mt-10">
           {/* Top Pill Badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-accent/10 border border-brand-accent/20 mb-6 animate-fade-in-up">
-            <span className="text-xs font-bold text-brand-accent uppercase tracking-wider">🏆 #1 {isFutures ? 'Futures' : 'Forex'} Firm Comparator</span>
+            <span className="text-xs font-bold text-brand-accent uppercase tracking-wider">🏆 #1 {modeLabel} Firm Comparator</span>
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[64px] font-black tracking-tighter mb-6 leading-[1.1] animate-fade-in-up w-full">
-            <span className="text-white block pb-2">Find & Compare Top {isFutures ? 'Futures' : 'Forex'} Firms</span>
+            <span className="text-white block pb-2">Find & Compare Top {modeLabel} Firms</span>
             <span className="block py-1 bg-brand-gradient bg-[length:200%_auto] bg-clip-text text-transparent animate-[shimmer_3s_linear_infinite]" style={{ filter: `drop-shadow(0 4px 20px var(--brand-glow))` }}>Trade Smarter Earn Bigger</span>
           </h1>
 
@@ -212,7 +215,7 @@ const LandingPage: React.FC = () => {
             {/* Desktop View (hidden on mobile) */}
             <div className="hidden md:flex flex-wrap justify-center gap-4 px-2">
               {[
-                { icon: Shield, text: `50+ Verified Top ${isFutures ? 'Futures' : 'Forex'} Firms` },
+                { icon: Shield, text: `50+ Verified Top ${modeLabel} Firms` },
                 { icon: BarChart3, text: '1000+ Challenges' },
                 { icon: Users, text: '9000+ Real Trader Reviews' },
                 { icon: Globe, text: '4M+ Monthly Website Views' }
@@ -230,7 +233,7 @@ const LandingPage: React.FC = () => {
                 {/* First set of badges */}
                 <div className="flex gap-3 px-3">
                   {[
-                    { icon: Shield, text: `50+ Verified Top ${isFutures ? 'Futures' : 'Forex'} Firms` },
+                    { icon: Shield, text: `50+ Verified Top ${modeLabel} Firms` },
                     { icon: BarChart3, text: '1000+ Challenges' },
                     { icon: Users, text: '9000+ Real Trader Reviews' },
                     { icon: Globe, text: '4M+ Monthly Website Views' }
@@ -244,7 +247,7 @@ const LandingPage: React.FC = () => {
                 {/* Second set of badges (for seamless loop) */}
                 <div className="flex gap-3 px-3" aria-hidden="true">
                   {[
-                    { icon: Shield, text: `50+ Verified Top ${isFutures ? 'Futures' : 'Forex'} Firms` },
+                    { icon: Shield, text: `50+ Verified Top ${modeLabel} Firms` },
                     { icon: BarChart3, text: '1000+ Challenges' },
                     { icon: Users, text: '9000+ Real Trader Reviews' },
                     { icon: Globe, text: '4M+ Monthly Website Views' }
@@ -398,7 +401,7 @@ const LandingPage: React.FC = () => {
           <div className="w-full max-w-[1300px] mx-auto flex justify-end mt-3 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
              <Link to={getModePath('/firms')}>
                 <button className="text-neutral-400 hover:text-white flex items-center gap-2 text-sm font-semibold transition-colors border border-white/5 bg-white/5 rounded-full px-5 py-2 hover:bg-white/10 hover:border-white/10 shadow-lg">
-                   View All {isFutures ? 'Futures' : ''} Firms <ArrowRight size={14} />
+                   View All {modeLabel} Firms <ArrowRight size={14} />
                 </button>
              </Link>
           </div>
@@ -485,7 +488,7 @@ const LandingPage: React.FC = () => {
                 <span className="text-[10px] font-bold text-brand-accent uppercase tracking-widest">Top Performers 2026</span>
               </div>
               <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3 tracking-tight">
-                Highest Rated <span className="text-brand-accent">{isFutures ? 'Futures' : 'Prop'} Firms</span>
+                Highest Rated <span className="text-brand-accent">{modeLabel} Firms</span>
               </h2>
               <p className="text-neutral-400 text-sm max-w-xl leading-relaxed">
                 Firms that have consistently delivered payouts and transparent trading conditions, vetted by our community.
@@ -514,7 +517,7 @@ const LandingPage: React.FC = () => {
           <div className="mt-14 text-center">
             <Link to={getModePath('/firms')}>
               <button className="group inline-flex items-center gap-3 px-8 py-4 bg-white/[0.03] border border-white/10 text-white font-bold rounded-2xl hover:bg-brand-accent hover:text-black hover:border-brand-accent transition-all duration-300 shadow-brand-glow">
-                <span>Explore All {isFutures ? 'Futures' : 'Prop'} Firms</span>
+                <span>Explore All {modeLabel} Firms</span>
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </button>
             </Link>
@@ -608,7 +611,7 @@ const LandingPage: React.FC = () => {
                         <span className="text-[9px] text-neutral-400 uppercase tracking-widest font-bold">Live Comparison</span>
                       </div>
                       <div className="flex gap-1.5">
-                        <span className="text-[8px] font-bold text-brand-accent bg-brand-accent/10 px-2 py-0.5 rounded border border-brand-accent/20">{isFutures ? 'Topstep' : 'FTMO'}</span>
+                        <span className="text-[8px] font-bold text-brand-accent bg-brand-accent/10 px-2 py-0.5 rounded border border-brand-accent/20">{mode === 'futures' ? 'Topstep' : mode === 'crypto' ? 'CryptoFund' : 'FTMO'}</span>
                         <span className="text-[8px] font-bold text-neutral-500 bg-[#1a1a1a] px-2 py-0.5 rounded border border-[#333]">Other</span>
                       </div>
                     </div>
@@ -762,10 +765,10 @@ const LandingPage: React.FC = () => {
                   </div>
                   <div className="p-3 space-y-2.5">
                     {[
-                      { user: 'JT', action: 'verified a $12.4K payout from', firm: isFutures ? 'Apex Trader' : 'FTMO', color: 'text-brand-accent' },
-                      { user: 'MK', action: 'left a 5-star review on', firm: isFutures ? 'Topstep' : 'Funding Pips', color: 'text-violet-400' },
-                      { user: 'AS', action: 'saved $240 using discount at', firm: isFutures ? 'MyFundedFutures' : 'The5ers', color: 'text-emerald-400' },
-                      { user: 'DL', action: 'compared 3 firms and chose', firm: isFutures ? 'Earn2Trade' : 'E8 Markets', color: 'text-blue-400' },
+                      { user: 'JT', action: 'verified a $12.4K payout from', firm: mode === 'futures' ? 'Apex Trader' : mode === 'crypto' ? 'Funding Pips' : 'FTMO', color: 'text-brand-accent' },
+                      { user: 'MK', action: 'left a 5-star review on', firm: mode === 'futures' ? 'Topstep' : mode === 'crypto' ? 'The5ers' : 'Funding Pips', color: 'text-violet-400' },
+                      { user: 'AS', action: 'saved $240 using discount at', firm: mode === 'futures' ? 'MyFundedFutures' : mode === 'crypto' ? 'E8 Markets' : 'The5ers', color: 'text-emerald-400' },
+                      { user: 'DL', action: 'compared 3 firms and chose', firm: mode === 'futures' ? 'Earn2Trade' : mode === 'crypto' ? 'FTMO' : 'E8 Markets', color: 'text-blue-400' },
                     ].map((item, i) => (
                       <div key={i} className="flex items-start gap-2">
                         <div className="w-5 h-5 rounded-md bg-[#1a1a1a] border border-[#333] flex items-center justify-center text-[7px] font-bold text-violet-300 flex-shrink-0 mt-0.5">{item.user}</div>

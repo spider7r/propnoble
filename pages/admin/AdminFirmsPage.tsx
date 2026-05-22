@@ -40,6 +40,7 @@ interface Firm {
   affiliate_link: string | null;
   logo_url: string | null;
   favicon: string | null;
+  rules_url: string | null;
   rating: number;
   status: string;
   description?: string;
@@ -53,7 +54,7 @@ interface Firm {
   payout_percentage?: number;
   last_30_days_payouts?: string;
   payout_growth?: string;
-  trading_type?: 'forex' | 'futures';
+  trading_type?: 'forex' | 'futures' | 'crypto';
 }
 
 const AdminFirmsPage: React.FC = () => {
@@ -194,6 +195,7 @@ const AdminFirmsPage: React.FC = () => {
       affiliate_link: formData.get('affiliate_link') as string,
       logo_url: formData.get('logo_url') as string,
       favicon: formData.get('favicon') as string,
+      rules_url: formData.get('rules_url') as string,
       rating: parseFloat(formData.get('rating') as string) || 0,
       status: formData.get('status') as string,
       trading_type: formData.get('trading_type') as string || 'forex',
@@ -436,9 +438,10 @@ const AdminFirmsPage: React.FC = () => {
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-brand-muted uppercase">Trading Type (Mode)</label>
-                      <select name="trading_type" defaultValue={selectedFirm?.trading_type || 'forex'} className="w-full bg-background-dark border border-brand-border rounded-lg p-3 text-white focus:border-brand-gold outline-none">
-                        <option value="forex">Forex (Default)</option>
-                        <option value="futures">Futures</option>
+                      <select name="trading_type" defaultValue={selectedFirm?.trading_type || 'futures'} className="w-full bg-background-dark border border-brand-border rounded-lg p-3 text-white focus:border-brand-gold outline-none">
+                        <option value="futures">Futures (Default)</option>
+                        <option value="forex">Forex</option>
+                        <option value="crypto">Crypto</option>
                       </select>
                     </div>
                   </div>
@@ -475,6 +478,13 @@ const AdminFirmsPage: React.FC = () => {
                       <div className="relative">
                         <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-muted" size={16} />
                         <input name="favicon" defaultValue={selectedFirm?.favicon || ''} className="w-full bg-background-dark border border-brand-border rounded-lg pl-10 pr-3 py-3 text-white focus:border-brand-gold outline-none" placeholder="https://.../favicon.ico" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-brand-muted uppercase">Prop Firm Rules URL</label>
+                      <div className="relative">
+                        <ExternalLink className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-muted" size={16} />
+                        <input name="rules_url" defaultValue={selectedFirm?.rules_url || ''} className="w-full bg-background-dark border border-brand-border rounded-lg pl-10 pr-3 py-3 text-white focus:border-brand-gold outline-none" placeholder="https://.../faq" />
                       </div>
                     </div>
                   </div>

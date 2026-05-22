@@ -10,7 +10,7 @@ const BrowseFirmsPage: React.FC = () => {
   const [firms, setFirms] = useState<PropFirm[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const isFutures = mode === 'futures';
+  const modeLabel = mode === 'futures' ? 'Futures' : mode === 'crypto' ? 'Crypto' : 'Forex';
 
   // Fetch Real Data
   useEffect(() => {
@@ -58,7 +58,7 @@ const BrowseFirmsPage: React.FC = () => {
     });
 
     return {
-      dynamicTitle: `Top ${isFutures ? 'Futures' : 'Forex'} Firms ${monthName} ${year}`,
+      dynamicTitle: `Top ${modeLabel} Firms ${monthName} ${year}`,
       todayDate: formattedToday
     };
   }, []);
@@ -117,7 +117,7 @@ const BrowseFirmsPage: React.FC = () => {
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div className="max-w-2xl">
                   <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-3">{dynamicTitle}</h1>
-                  <p className="text-neutral-400 text-lg">Compare, review, and discover the world's leading {isFutures ? 'futures' : 'proprietary'} trading firms designed for professional traders.</p>
+                  <p className="text-neutral-400 text-lg">Compare, review, and discover the world's leading {modeLabel.toLowerCase()} trading firms designed for professional traders.</p>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-neutral-400">
                   <span className="material-symbols-outlined text-brand-accent text-[18px]">verified</span>

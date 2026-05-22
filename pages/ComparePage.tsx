@@ -11,7 +11,7 @@ const ComparePage: React.FC = () => {
   const { mode, getModePath } = useTradeMode();
   const { selectedFirms, removeFirm, toggleFirm } = useComparison();
   const [allFirms, setAllFirms] = useState<PropFirm[]>([]);
-  const isFutures = mode === 'futures';
+  const modeLabel = mode === 'futures' ? 'Futures' : mode === 'crypto' ? 'Crypto' : 'Prop';
 
   // Array of 3 slots, filled with selected firms
   const slots = [0, 1, 2].map(i => selectedFirms[i] || null);
@@ -23,11 +23,12 @@ const ComparePage: React.FC = () => {
       
       // Filter by mode
       const filtered = (data || []).filter(firm => {
-          if (isFutures) {
-              return firm.tags?.some(t => t.toLowerCase() === 'futures') || firm.name.toLowerCase().includes('futures');
-          } else {
-              return !firm.tags?.some(t => t.toLowerCase() === 'futures') || firm.name.toLowerCase().includes('forex');
-          }
+          if (firm.trading_type) return firm.trading_type === mode;
+          const isFutures = firm.tags?.some(t => t.toLowerCase() === 'futures') || firm.name.toLowerCase().includes('futures');
+          const isCrypto = firm.tags?.some(t => t.toLowerCase() === 'crypto') || firm.name.toLowerCase().includes('crypto');
+          if (mode === 'futures') return isFutures;
+          if (mode === 'crypto') return isCrypto;
+          return !isFutures && !isCrypto;
       });
 
       setAllFirms(filtered);
@@ -54,7 +55,7 @@ const ComparePage: React.FC = () => {
           {/* Heading */}
           <div className="flex flex-col md:flex-row justify-between gap-4 md:items-end pb-4 border-b border-white/5">
             <div className="flex flex-col gap-2">
-              <h1 className="text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Compare {isFutures ? 'Futures' : 'Prop'} Firms</h1>
+              <h1 className="text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Compare {modeLabel} Firms</h1>
               <p className="text-neutral-400 text-base max-w-2xl">Select up to 3 firms to analyze trading conditions, fees, and rules side-by-side.</p>
             </div>
             <div className="flex gap-3">

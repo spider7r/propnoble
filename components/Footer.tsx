@@ -20,7 +20,11 @@ const Footer: React.FC = () => {
           {/* Col 1: Brand (moved from 5th) */}
           <div>
             <div className="flex items-center mb-4">
-              <img src={mode === 'futures' ? '/nobelf-logo.png' : '/nobel-logo.png'} alt="PropNoble" className="h-24 w-auto" />
+              <img 
+                src={mode === 'crypto' ? '/noble-crypto.png' : mode === 'forex' ? '/noble-forex.png' : '/noble-futures.png'} 
+                alt="PropNoble" 
+                className="h-16 md:h-20 w-auto object-contain" 
+              />
             </div>
             <p className="text-neutral-500 text-xs leading-relaxed">
               The #1 destination for traders to compare, review, and find the best prop trading firms.

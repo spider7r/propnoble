@@ -29,7 +29,7 @@ const OffersPage: React.FC = () => {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
-  const isFutures = mode === 'futures';
+  const modeLabel = mode === 'futures' ? 'Futures' : mode === 'crypto' ? 'Crypto' : 'Prop';
 
   useEffect(() => {
     fetchOffers();
@@ -54,14 +54,15 @@ const OffersPage: React.FC = () => {
         const firm = (offer.firms as any);
         
         // Strict check: if trading_type is set, respect it exactly
-        if (firm?.trading_type === 'futures') return isFutures;
-        if (firm?.trading_type === 'forex') return !isFutures;
+        if (firm?.trading_type) return firm.trading_type === mode;
 
         // Fallback for old/untyped data
         const isFuturesFirm = firm?.tags?.some((t: string) => t.toLowerCase() === 'futures') || firm?.name?.toLowerCase().includes('futures');
+        const isCryptoFirm = firm?.tags?.some((t: string) => t.toLowerCase() === 'crypto') || firm?.name?.toLowerCase().includes('crypto');
 
-        if (isFutures) return isFuturesFirm;
-        return !isFuturesFirm;
+        if (mode === 'futures') return isFuturesFirm;
+        if (mode === 'crypto') return isCryptoFirm;
+        return !isFuturesFirm && !isCryptoFirm;
       });
 
       setOffers(filtered);
@@ -96,7 +97,7 @@ const OffersPage: React.FC = () => {
               <Zap size={14} /> VIP Trading Benefits
             </div>
             <h1 className="text-5xl md:text-6xl font-black text-white mb-6 tracking-tight uppercase animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-              Exclusive <span className="text-brand-accent">{isFutures ? 'Futures' : 'Prop'} Deals</span>
+              Exclusive <span className="text-brand-accent">{modeLabel} Deals</span>
             </h1>
             <p className="text-brand-muted text-lg font-medium leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
               Unlock massive savings on the world's most reputable prop firms. 
@@ -109,7 +110,7 @@ const OffersPage: React.FC = () => {
                 <ShieldCheck size={20} />
                 <span className="text-xl font-black">{offers.filter(o => o.verified).length}</span>
              </div>
-             <span className="text-[10px] font-black uppercase tracking-widest text-neutral-500 text-center">Verified {isFutures ? 'Futures' : 'Prop'} Offers<br/>Available Today</span>
+             <span className="text-[10px] font-black uppercase tracking-widest text-neutral-500 text-center">Verified {modeLabel} Offers<br/>Available Today</span>
           </div>
         </div>
 

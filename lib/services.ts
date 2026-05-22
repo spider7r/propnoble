@@ -89,7 +89,8 @@ export const mapFirmFromDB = (dbFirm: any): PropFirm => {
         payoutPercentage: dbFirm.payout_percentage || 95,
         last30DaysPayouts: dbFirm.last_30_days_payouts || '$0',
         payoutGrowth: dbFirm.payout_growth || '0%',
-        trading_type: dbFirm.trading_type
+        trading_type: dbFirm.trading_type,
+        rules_url: dbFirm.rules_url
     };
 };
 
@@ -111,7 +112,7 @@ const mapChallengeFromDB = (dbChallenge: any): Challenge => {
 
 export const FirmService = {
     // Fetch all ACTIVE firms for Browse Page
-    async getActiveFirms(mode?: 'forex' | 'futures'): Promise<PropFirm[]> {
+    async getActiveFirms(mode?: 'forex' | 'futures' | 'crypto'): Promise<PropFirm[]> {
         // Fetch all active firms first to avoid "missing column" errors in SQL if trading_type isn't added yet
         const { data, error } = await supabase
             .from('firms')
@@ -133,12 +134,16 @@ export const FirmService = {
             // Explicit trading_type check (highest priority)
             if (firm.trading_type === 'futures') return mode === 'futures';
             if (firm.trading_type === 'forex') return mode === 'forex';
+            if (firm.trading_type === 'crypto') return mode === 'crypto';
 
             // Fallback for untagged/old data
             const isFuturesDetected = firm.tags?.some(t => t.toLowerCase() === 'futures') || firm.name.toLowerCase().includes('futures');
+            const isCryptoDetected = firm.tags?.some(t => t.toLowerCase() === 'crypto') || firm.name.toLowerCase().includes('crypto');
             
             if (mode === 'futures') return isFuturesDetected;
-            return !isFuturesDetected; // Forex mode shows everything else
+            if (mode === 'crypto') return isCryptoDetected;
+            // Forex mode shows everything that isn't futures or crypto
+            return !isFuturesDetected && !isCryptoDetected;
         });
     },
 

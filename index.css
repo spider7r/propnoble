@@ -1,5 +1,5 @@
 :root {
-  /* Default: Forex Theme (Red) */
+  /* Default: Futures Theme (Red/Orange) */
   --brand-accent: #ff3300;
   --brand-accent-rgb: 255, 51, 0;
   --brand-accent-hover: #e62e00;
@@ -8,14 +8,24 @@
   --brand-gradient: linear-gradient(135deg, #ff3300 0%, #ff6b00 100%);
 }
 
-[data-theme='futures'] {
-  /* Futures Theme (Cyan/Electric Blue) */
+[data-theme='forex'] {
+  /* Forex Theme (Cyan/Electric Blue) */
   --brand-accent: #00f2ff;
   --brand-accent-rgb: 0, 242, 255;
   --brand-accent-hover: #00d4df;
   --brand-glow: rgba(0, 242, 255, 0.3);
   --brand-glow-strong: rgba(0, 242, 255, 0.5);
   --brand-gradient: linear-gradient(135deg, #00f2ff 0%, #00a3ff 100%);
+}
+
+[data-theme='crypto'] {
+  /* Crypto Theme (Emerald Green) */
+  --brand-accent: #00df81;
+  --brand-accent-rgb: 0, 223, 129;
+  --brand-accent-hover: #00c773;
+  --brand-glow: rgba(0, 223, 129, 0.3);
+  --brand-glow-strong: rgba(0, 223, 129, 0.5);
+  --brand-gradient: linear-gradient(135deg, #00df81 0%, #009959 100%);
 }
 
 .text-brand-accent { color: var(--brand-accent); }

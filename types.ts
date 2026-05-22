@@ -55,7 +55,8 @@ export interface PropFirm {
   payoutPercentage?: number;
   last30DaysPayouts?: string;
   payoutGrowth?: string;
-  trading_type?: 'forex' | 'futures';
+  trading_type?: 'forex' | 'futures' | 'crypto';
+  rules_url?: string;
 }
 
 export interface Review {
