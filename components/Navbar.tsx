@@ -60,17 +60,6 @@ const Navbar: React.FC = () => {
 
             {/* Desktop Actions */}
             <div className="hidden md:flex items-center gap-4 shrink-0">
-              <div className="flex items-center gap-2 border-r border-white/10 pr-4">
-                <a href="#" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-brand-accent/30 text-brand-accent text-xs font-bold hover:bg-brand-accent/10 transition-colors">
-                  <span className="w-2 h-2 rounded-full bg-brand-accent animate-pulse"></span>
-                  We're Hiring
-                </a>
-                <a href="#" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10 text-white text-xs font-bold hover:bg-white/10 transition-colors">
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                  Tutorials
-                </a>
-              </div>
-
               {user ? (
                 <Link to={getModePath('/dashboard')}>
                   <Button variant="secondary" size="sm" className="gap-2 bg-brand-accent/10 text-brand-accent border-brand-accent/20 hover:bg-brand-accent hover:text-white rounded-full">
@@ -164,17 +153,7 @@ const Navbar: React.FC = () => {
             ))}
           </div>
 
-          {/* Quick Actions */}
-          <div className="grid grid-cols-2 gap-3">
-            <a href="#" className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-brand-accent/5 border border-brand-accent/20 text-brand-accent text-xs font-bold">
-              <Sparkles size={14} />
-              We're Hiring
-            </a>
-            <a href="#" className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-bold">
-              <BookOpen size={14} />
-              Tutorials
-            </a>
-          </div>
+
 
           {/* Auth Buttons */}
           <div className="pt-3 border-t border-[#2a2a2a] space-y-3">
